@@ -2,8 +2,11 @@
 
 ### List of projects
 
-#### [Browsers Benchmark](https://github.com/SlyMaximus/CorF/tree/master/browsersBenchmark) - Windows browsers benchmark
+#### [Serspec](https://github.com/SlyMaximus/CorF/tree/master/Serspec)
+	 Technologies info: C++ 1x project
 
 #### [Bounce Figures](https://github.com/SlyMaximus/CorF/tree/master/ShakeFigures)
+	 Technologies info: C++ 1x & MFC project
 
-#### [Serspec](https://github.com/SlyMaximus/CorF/tree/master/Serspec)
+#### [Browsers Benchmark](https://github.com/SlyMaximus/CorF/tree/master/browsersBenchmark) - Windows browsers benchmark
+	 Technologies info: C# console project
