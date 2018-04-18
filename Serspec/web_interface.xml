@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<namedoperations xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://serspectis.com/pxml/stable/po/PO2NamedOperations.xsd">
+	
+	<!-- Initialization of socket server -->
+	<namedoperation final="true" name="startWebInterface">
+		<param name="port" default="EnvValue('port');"/>
+		
+		<operation>
+			<!-- calling the shared_std defined namedop -->
+			<callnamedop name="startWebInterfaceBase">
+				<withparam name="port" value="port;" />
+			</callnamedop>
+		</operation>
+		
+		<operation active="false">
+			<setenv key="PXMLDocument.StoreGUISettings" value="FALSE"/>
+		</operation>
+
+	</namedoperation>
+	
+	<namedoperation final="true" name="stopWebInterface">
+		<param name="port" default="EnvValue('port');"/>
+				
+		<operation>
+			<!-- calling the shared_std defined namedop -->
+			<callnamedop name="stopWebInterfaceBase">
+				<withparam name="port" value="port;"/>
+			</callnamedop>
+		</operation>
+	</namedoperation>
+	
+	
+	<namedoperation name="postLoginWebInterface" final="true" visibility="internal">
+		<!-- the login sequence writes a bunch of files which are not needed in the web scenario -->
+			
+		<operation active="DirectoryExists(DirectoryName(call getSettingsDir()));">
+			<directorydelete startingdir="${= DirectoryName(call getSettingsDir());}" warn="false" warn_failure="false"/>
+		</operation>
+
+	</namedoperation>	
+	
+	<!-- session initialization -->
+	<namedoperation name="initSession" final="true">
+		<param name="sessionid" type="String" comment="The Session Id sent by Dispatcher"/>
+		<param name="userid" type="String" comment="The User Id for the current PO/CO session"/>
+		<param name="groupid" type="String" comment="The Group Id for the current PO/CO session"/>
+		<param name="additionaldata" type="String" default="" comment="Additional user information (first name, etc) in UTF-8 encoded json format"/>
+		<param name="language" type="String" default="de" comment="The language used in the current PO/CO session"/>
+
+		<operation>
+			<addprotocolentry category="INFO" text='`Starting Session "`++SessionId()++`" using port "` ++ Expand(`${port}`) ++`"`;'/>
+		</operation>
+
+		<operation>
+			<executeexpression expression="'';" returnvariable="retval"/>
+		</operation>
+		
+		<operation>
+			<setlanguage language="${=language;}"/>
+		</operation>
+
+		<operation>
+			<validateuserrole userid="${= userid;}" groupid="${= groupid;}" hash=""/>
+		</operation>
+
+		<operation>
+			<configuratormessage wait="true" mode="call_named_op" command="initSession" id="configurator">
+				<withparam name="sessionid" value="sessionid;"/>
+				<withparam name="userid" value="userid;"/>
+				<withparam name="groupid" value="groupid;"/>
+				<withparam name="additionaldata" value="additionaldata;"/>
+				<withparam name="language" value="language;"/>
+			</configuratormessage>
+		</operation>		
+
+		<operation>
+			<callnamedop name="customInitSession">
+				<withparam name="sessionid" value="sessionid;"/>
+				<withparam name="userid" value="userid;"/>
+				<withparam name="groupid" value="groupid;"/>
+				<withparam name="additionaldata" value="additionaldata;"/>
+				<withparam name="language" value="language;"/>
+			</callnamedop>
+		</operation>
+		
+		<operation>
+			<callnamedop name="initUserInfo"/>
+		</operation>
+
+	</namedoperation>
+	
+	<!-- project initialization -->
+	<namedoperation final="true" name="initDocument" comment="The initialization for the PO in web scenario">
+		<param name="prototype" type="String" default="" comment="startup prototype of type (pxax). The prototype must be available in the local webprotos folder."/>
+		<param name="topic" type="String" comment="the initial topic"/>
+		<param name="userinfo" type="String" default="" comment="user information in UTF-8 encoded json format."/>
+		<param name="projectinfo" type="String" default="" comment="project information in UTF-8 encoded json format."/>
+		<param name="documentid" type="String" comment="Project ID; must NOT be empty"/> 
+		
+		<localvar name="zipFile" value="ConcatPath(GetOutputDirectory(), 'document.zip');" comment="we agreed that project zip is always called 'document.zip'."/>
+		<localvar name="pxazFile" value="ConcatPath(GetOutputDirectory(), 'document_'++documentid++'.pxpz');" comment="Some code in openLocalProject expects the pxpz file extension. The filename should also alter if we load another document within the same session."/>
+		<localvar name="retvalCO" value=""/>
+		<localvar name="projectid" value=""/>
+		
+		<!-- first must check if any project already open and, if so, close it -->
+		<operation active="my openList= call getLPList();
+							my projIdToClose= '';
+							my retVal= false; 
+							if (Size(openList) gt 0) {
+								retVal= true;
+								projIdToClose= openList[0];
+							}
+							retVal;">
+
+			<callnamedop name="closeLocalProject">
+				<withparam name="projectid" value="projIdToClose;"/>
+			</callnamedop>
+		</operation>
+		
+		<operation active="FileExists(zipFile);">
+			<filemove source="${=zipFile;}" target="${=pxazFile;}"/>
+		</operation>
+		<operation>
+			<callnamedop name="customInitDocument">
+				<withparam name="prototype" value="prototype;"/>
+				<withparam name="topic" value="topic;"/>
+				<withparam name="userinfo" value="userinfo;"/>
+				<withparam name="projectinfo" value="projectinfo;"/>
+				<withparam name="documentid" value="documentid;"/>
+			</callnamedop>
+		</operation>
+		
+		<operation>
+			<configuratormessage wait="true" mode="call_named_op" command="initDocumentCO" id="configurator" returnvariable="retvalCO">
+				<withparam name="prototype" value="prototype;"/>
+				<withparam name="topic" value="topic;"/>
+				<withparam name="userinfo" value="userinfo;"/>
+				<withparam name="projectinfo" value="projectinfo;"/> 
+			</configuratormessage>
+		</operation>
+		
+		<operation active="FileExists(pxazFile) and not StringContains(retvalCO, 'ERROR: ');">
+			<callnamedop name="openLocalProject" returnvariable="projectid">
+				<withparam name="archive" value="pxazFile;"/>
+			</callnamedop>
+		</operation>
+
+		<returnvalue value="my val= '';
+		if (StringContains(retvalCO, 'ERROR: ')) {
+			val= retvalCO;
+		}
+		else if (not FileExists(pxazFile)) {
+			val='ERROR: MISSINGPROJECT: ' ++ pxazFile;
+		}
+		else if (GetLoadedConfiguratorNode('configurator') eq null) {
+			val='ERROR: OPENCONFIGFAILED: ' ++ pxazFile;
+		}
+		else if (projectid eq '' or EnvValue('errorcode') ne '0') {
+			val='ERROR: OPENPROJFAILED: ' ++ pxazFile;
+		}
+		val;"/>
+	</namedoperation>
+	
+	<namedoperation final="true" name="saveDocument" comment="It is used to save the current configuration/project and to save it, as binary content, to Dispatcher">
+		<param name="documentid" default="" type="String" comment="The project id, might be empty if the polymer connector does not support early creation of ids."/>
+		
+		<localvar name="projectid" value="my projid= '';
+										my list= call getLPList(); 
+										if (Size(list) gt 0) {
+											projid= list[0];
+										}
+										else {
+											projid= documentid;
+										}
+										projid;"/>
+		
+		<localvar name="retval" value=""/>
+		
+		<operation>
+			<callnamedop name="saveWebProject" returnvariable="retval"/>
+		</operation>
+		
+		<!-- TODO: rework the exception handling -->
+		<returnvalue value="LoadBinary(call getLPArchive(projectid));" />
+	</namedoperation>
+		
+	<namedoperation final="true" name="getTableViewerData" comment="Returns header and body information of the table viewer with the given viewer id.">
+		<param name="viewerid" type="String" comment="The viewer id of the table viewer."/>
+		<operation>
+			<operationlist contextviewer="${=my projectid= OpenProjectIds()[0]; return ProjectViewer(projectid,viewerid);}" returnvariable="result">
+				<operation>
+					<callnamedop name="customGetTableViewerData" returnvariable="result">
+						<withparam name="viewerid" value="viewerid;"/>
+					</callnamedop>
+				</operation>
+				<operation active="result eq null;">
+					<executeexpression expression="return TableViewerInfo(viewerid, List('ci_quantity','ci_item_number', 'description', 'ci_price'));" returnvariable="result"/>
+				</operation>
+				<returnvalue value="result;"/><!-- passing the return value to the outer operation list -->
+			</operationlist>
+		</operation> 
+		<returnvalue value="return result eq null ? ('ERROR: could not find table viewer '++viewerid) : result;"/>
+	</namedoperation>
+	
+	<namedoperation final="true" name="performTableViewerInput" comment="Simulates the editing of a table viewer cell. returns a Dictionary with status (ok, failed or error) and a failuretext.">
+		<param name="viewerid" type="String" comment="The viewer id of the table viewer."/>
+		<param name="rowindex" type="Integer" comment="The 0-based index of the row to be modified"/>
+		<param name="columnid" type="String" comment="The column id of the cell which should be modified."/>
+		<param name="value" type="String" comment="The new value to be set into the table cell."/>
+		<operation>
+			<operationlist contextviewer="${=my projectid= OpenProjectIds()[0]; return ProjectViewer(projectid,viewerid);}" returnvariable="result">
+				<operation>
+					<simulatetableviewercellinput rowindex="rowindex;" columnid="columnid;" viewerid="${=viewerid;}" value="value;" returnvariable="result"/>
+				</operation>
+				<returnvalue value="result;"/><!-- passing the return value to the outer operation list -->
+			</operationlist>
+		</operation> 
+		<returnvalue value="result;"/>
+	</namedoperation>
+	
+	<namedoperation name="getDatabagViewerData" comment="returns information about a databag viewer to the web frontend. This operation does not select a specific node. If the given databag viewer requires a special node to be selected, overwrite the customGetDatabagViewerData hook operation.">
+		<param name="viewerid" type="String" comment="The id of the databag viewer."/>
+		<operation>
+			<operationlist contextviewer="${=my projectid= OpenProjectIds()[0]; return ProjectViewer(projectid,'projecttree');}" returnvariable="result">
+				<operation>
+					<callnamedop name="customGetDatabagViewerData" returnvariable="result">
+						<withparam name="viewerid" value="viewerid;"/>
+					</callnamedop>
+				</operation>
+				<operation active="result eq null;">
+					<executeexpression expression="return DatabagViewerInfo(viewerid);" returnvariable="result"/>
+				</operation>
+				<returnvalue value="result;"/>
+			</operationlist>
+		</operation>
+		<returnvalue value="return (result eq null) ? ('ERROR: could not find databag viewer '++viewerid) : result;"/>
+	</namedoperation>
+	
+	<namedoperation final="true" name="performDatabagViewerInput" comment="Simulates the editing of a databag viewer. returns a Dictionary with status (ok, failed or error) and a failuretext.">
+		<param name="viewerid" type="String" comment="The viewer id of the table viewer."/>
+		<param name="elementid" type="String" comment="The id of the databag viewer element."/>
+		<param name="value" type="String" comment="The new value."/>
+		<operation>
+			<operationlist contextviewer="${=my projectid= OpenProjectIds()[0]; return ProjectViewer(projectid,'projecttree');}" returnvariable="result">
+				<operation>
+					<callnamedop name="customPerformDatabagViewerInput" returnvariable="result">
+						<withparam name="viewerid" value="viewerid;"/>
+						<withparam name="elementid" value="elementid;"/>
+						<withparam name="value" value="value;"/>
+					</callnamedop>
+				</operation>
+				<operation active="result eq null;">
+					<simulatedatabaginput dataelementid="${=elementid;}" viewerid="${=viewerid;}" value="value;" returnvariable="result"/>
+				</operation>
+				<returnvalue value="result;"/><!-- passing the return value to the outer operation list -->
+			</operationlist>
+		</operation> 
+		<returnvalue value="if (result['status'] ne 'success' and result['status'] ne 'failed') {
+			return 'ERROR: '++result['failuretext'];
+		};
+		return result;
+		"/>
+	</namedoperation>
+	
+	<!-- project user initialization -->
+	<namedoperation name="initUserInfo" final="true">
+		<operation>
+			<callnamedop name="initSession">
+				<withparam name="sessionid" value="GenerateUUID();"/>
+				<withparam name="userid" value="GetUser();"/>
+				<withparam name="groupid" value="GetUserGroup();"/>
+			</callnamedop>
+		</operation>
+		
+	</namedoperation>
+
+	
+</namedoperations>

@@ -1,0 +1,100 @@
+Q1 - How many namedops are in the file?
+There are 11 'namedoperation'
+---------------------------------------------------------------
+Q2 - Which namedop identified by itÆs 'name' attribute is the most complex ?
+ Which one is the least complex ?
+The most complex 'namedop' is 'initSession' (count 7)
+The less complex 'namedop' is 'initUserInfo' (count 1)
+---------------------------------------------------------------
+Q3 - Which namedop has a return value ?
+The 'namedoperation' with 'returnedvalue' are:
+        initDocument
+        saveDocument
+        getTableViewerData
+        performTableViewerInput
+        getDatabagViewerData
+        performDatabagViewerInput
+---------------------------------------------------------------
+Q4 - Which is the maximum call depth for each namedop?
+[execute-namedop] startWebInterface
+[execute-operation]
+[execute-callednamed-operation] -> startWebInterfaceBase
+[execute-operation]
+[execute-namedop] stopWebInterface
+[execute-operation]
+[execute-callednamed-operation] -> stopWebInterfaceBase
+[execute-namedop] postLoginWebInterface
+[execute-operation]
+[execute-namedop] initSession
+[execute-operation]
+[execute-operation]
+[execute-operation]
+[execute-operation]
+[execute-operation]
+[execute-operation]
+[execute-callednamed-operation] -> customInitSession
+[execute-operation]
+[execute-callednamed-operation] -> initUserInfo
+[execute-namedop] initUserInfo
+[execute-operation]
+[execute-callednamed-operation] -> performDatabagViewerInput
+[execute-namedop] performDatabagViewerInput
+[execute-operation]
+[execute-operation]
+[execute-callednamed-operation] -> customPerformDatabagViewerInput
+[execute-operation]
+[execute-namedop] initDocument
+[execute-operation]
+[execute-callednamed-operation] -> closeLocalProject
+[execute-operation]
+[execute-operation]
+[execute-callednamed-operation] -> customInitDocument
+[execute-operation]
+[execute-operation]
+[execute-callednamed-operation] -> openLocalProject
+[execute-namedop] saveDocument
+[execute-operation]
+[execute-callednamed-operation] -> saveWebProject
+[execute-namedop] getTableViewerData
+[execute-operation]
+[execute-operation]
+[execute-callednamed-operation] -> customGetTableViewerData
+[execute-operation]
+[execute-namedop] performTableViewerInput
+[execute-operation]
+[execute-operation]
+[execute-namedop] getDatabagViewerData
+[execute-operation]
+[execute-operation]
+[execute-callednamed-operation] -> customGetDatabagViewerData
+[execute-operation]
+[execute-namedop] performDatabagViewerInput
+[execute-operation]
+[execute-operation]
+[execute-callednamed-operation] -> customPerformDatabagViewerInput
+[execute-operation]
+[execute-namedop] initUserInfo
+[execute-operation]
+[execute-callednamed-operation] -> performDatabagViewerInput
+[execute-namedop] performDatabagViewerInput
+[execute-operation]
+[execute-operation]
+[execute-callednamed-operation] -> customPerformDatabagViewerInput
+[execute-operation]
+______________________________________
+The maximum call depth is executed in
+namedoperation: performDatabagViewerInput
+---------------------------------------------------------------
+Q5 - Which is the maximum call depth for each namedop ?
+The most depth node(s) using priority_queue
+namedop: startWebInterface       depth: 2
+namedop: postLoginWebInterface   depth: 2
+namedop: getTableViewerData      depth: 2
+namedop: initUserInfo    depth: 2
+namedop: performDatabagViewerInput       depth: 2
+namedop: getDatabagViewerData    depth: 2
+namedop: saveDocument    depth: 2
+namedop: performTableViewerInput         depth: 2
+namedop: initDocument    depth: 2
+namedop: stopWebInterface        depth: 2
+namedop: initSession     depth: 2

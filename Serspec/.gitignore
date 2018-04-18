@@ -6,8 +6,6 @@
 *.lo
 *.o
 *.obj
-*.log
-*.lastbuildstate
 
 # Precompiled Headers
 *.gch
@@ -39,15 +37,9 @@
 *.vc.vc.opendb
 *.vcxproj.user
 .vs/
-bin/
-bin64/
+debug/
+release/
 ipch/
-ShakeFigures/Debug/
-ShakeFigures/Debug/ShakeFigures.tlog/
-ShakeFigures/Release/
-Serspec/x64/Debug/
-Serspec/win32/Debug/
-Serspec/x64/Release/
-Serspec/win32/Release/
-browsersBenchmark/obj/Debug/
-browsersBenchmark/obj/Release/
+src/psa/x64/
+Debug/
+Release/

@@ -1,0 +1,87 @@
+Q1 - How many namedops are in the file?
+There are 11 'namedoperation'
+---------------------------------------------------------------
+Q2 - Which namedop identified by itÆs 'name' attribute is the most complex ?
+ Which one is the least complex ?
+ERROR - Top list is empty
+---------------------------------------------------------------
+Q3 - Which namedop has a return value ?
+'namedoperation' with 'returnedvalue'
+'namedoperation' with 'returnedvalue'
+'namedoperation' with 'returnedvalue'
+'namedoperation' with 'returnedvalue'
+'namedoperation' with 'returnedvalue'
+'namedoperation' with 'returnedvalue'
+---------------------------------------------------------------
+Q4 - Which is the maximum call depth for each namedop?
+[execute-namedop]
+         [execute-operation]
+[execute-NAMEOP] -> closeLocalProject
+         [execute-operation]
+         [execute-operation]
+[execute-NAMEOP] -> customInitDocument
+         [execute-operation]
+         [execute-operation]
+[execute-NAMEOP] -> openLocalProject
+[execute-namedop]
+         [execute-operation]
+[execute-NAMEOP] -> startWebInterfaceBase
+         [execute-operation]
+[execute-namedop]
+         [execute-operation]
+[execute-NAMEOP] -> stopWebInterfaceBase
+[execute-namedop]
+         [execute-operation]
+[execute-NAMEOP] -> saveWebProject
+[execute-namedop]
+         [execute-operation]
+[execute-namedop]
+         [execute-operation]
+         [execute-operation]
+[execute-NAMEOP] -> customGetDatabagViewerData
+         [execute-operation]
+[execute-namedop]
+         [execute-operation]
+         [execute-operation]
+         [execute-operation]
+         [execute-operation]
+         [execute-operation]
+         [execute-operation]
+[execute-NAMEOP] -> customInitSession
+         [execute-operation]
+[execute-NAMEOP] -> initUserInfo
+[execute-namedop]
+         [execute-operation]
+[execute-NAMEOP] -> performDatabagViewerInput
+[execute-namedop]
+         [execute-operation]
+         [execute-operation]
+[execute-NAMEOP] -> customPerformDatabagViewerInput
+         [execute-operation]
+[execute-namedop]
+         [execute-operation]
+         [execute-operation]
+[execute-NAMEOP] -> customGetTableViewerData
+         [execute-operation]
+[execute-namedop]
+         [execute-operation]
+         [execute-operation]
+[execute-namedop]
+         [execute-operation]
+         [execute-operation]
+[execute-NAMEOP] -> customPerformDatabagViewerInput
+         [execute-operation]
+[execute-namedop]
+         [execute-operation]
+[execute-NAMEOP] -> performDatabagViewerInput
+[execute-namedop]
+         [execute-operation]
+         [execute-operation]
+[execute-NAMEOP] -> customPerformDatabagViewerInput
+         [execute-operation]
+The maximum call depth is executed in
+namedoperation: performDatabagViewerInput
+---------------------------------------------------------------
+Q5 - Which is the maximum call depth for each namedop ?
+The most depth node(s) using priority_queue
+namedop: performDatabagViewerInput       depth: 8

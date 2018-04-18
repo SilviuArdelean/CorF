@@ -1,0 +1,397 @@
+element: name='namedoperations', value=''
+    element: name='namedoperation', value=''
+        --> final=true
+        --> name=startWebInterface
+      element: name='param', value=''
+        --> name=port
+        --> default=EnvValue('port');
+      element: name='operation', value=''
+        element: name='callnamedop', value=''
+                --> name=startWebInterfaceBase
+      element: name='withparam', value=''
+        --> name=port
+        --> value=port;
+      element: name='operation', value=''
+        --> active=false
+      element: name='setenv', value=''
+        --> key=PXMLDocument.StoreGUISettings
+        --> value=FALSE
+    element: name='namedoperation', value=''
+        --> final=true
+        --> name=stopWebInterface
+      element: name='param', value=''
+        --> name=port
+        --> default=EnvValue('port');
+      element: name='operation', value=''
+        element: name='callnamedop', value=''
+                --> name=stopWebInterfaceBase
+      element: name='withparam', value=''
+        --> name=port
+        --> value=port;
+    element: name='namedoperation', value=''
+        --> name=postLoginWebInterface
+        --> final=true
+        --> visibility=internal
+      element: name='operation', value=''
+        --> active=DirectoryExists(DirectoryName(call getSettingsDir()));
+      element: name='directorydelete', value=''
+        --> startingdir=${= DirectoryName(call getSettingsDir());}
+        --> warn=false
+        --> warn_failure=false
+    element: name='namedoperation', value=''
+        --> name=initSession
+        --> final=true
+      element: name='param', value=''
+        --> name=sessionid
+        --> type=String
+        --> comment=The Session Id sent by Dispatcher
+      element: name='param', value=''
+        --> name=userid
+        --> type=String
+        --> comment=The User Id for the current PO/CO session
+      element: name='param', value=''
+        --> name=groupid
+        --> type=String
+        --> comment=The Group Id for the current PO/CO session
+      element: name='param', value=''
+        --> name=additionaldata
+        --> type=String
+        --> default=
+        --> comment=Additional user information (first name, etc) in UTF-8 encoded json format
+      element: name='param', value=''
+        --> name=language
+        --> type=String
+        --> default=de
+        --> comment=The language used in the current PO/CO session
+      element: name='operation', value=''
+      element: name='addprotocolentry', value=''
+        --> category=INFO
+        --> text=`Starting Session "`++SessionId()++`" using port "` ++ Expand(`${port}`) ++`"`;
+      element: name='operation', value=''
+      element: name='executeexpression', value=''
+        --> expression='';
+        --> returnvariable=retval
+      element: name='operation', value=''
+      element: name='setlanguage', value=''
+        --> language=${=language;}
+      element: name='operation', value=''
+      element: name='validateuserrole', value=''
+        --> userid=${= userid;}
+        --> groupid=${= groupid;}
+        --> hash=
+      element: name='operation', value=''
+      element: name='configuratormessage', value=''
+        --> wait=true
+        --> mode=call_named_op
+        --> command=initSession
+        --> id=configurator
+      element: name='withparam', value=''
+        --> name=sessionid
+        --> value=sessionid;
+      element: name='withparam', value=''
+        --> name=userid
+        --> value=userid;
+      element: name='withparam', value=''
+        --> name=groupid
+        --> value=groupid;
+      element: name='withparam', value=''
+        --> name=additionaldata
+        --> value=additionaldata;
+      element: name='withparam', value=''
+        --> name=language
+        --> value=language;
+      element: name='operation', value=''
+        element: name='callnamedop', value=''
+                --> name=customInitSession
+      element: name='withparam', value=''
+        --> name=sessionid
+        --> value=sessionid;
+      element: name='withparam', value=''
+        --> name=userid
+        --> value=userid;
+      element: name='withparam', value=''
+        --> name=groupid
+        --> value=groupid;
+      element: name='withparam', value=''
+        --> name=additionaldata
+        --> value=additionaldata;
+      element: name='withparam', value=''
+        --> name=language
+        --> value=language;
+      element: name='operation', value=''
+        element: name='callnamedop', value=''
+                --> name=initUserInfo
+    element: name='namedoperation', value=''
+        --> final=true
+        --> name=initDocument
+        --> comment=The initialization for the PO in web scenario
+      element: name='param', value=''
+        --> name=prototype
+        --> type=String
+        --> default=
+        --> comment=startup prototype of type (pxax). The prototype must be available in the local webprotos folder.
+      element: name='param', value=''
+        --> name=topic
+        --> type=String
+        --> comment=the initial topic
+      element: name='param', value=''
+        --> name=userinfo
+        --> type=String
+        --> default=
+        --> comment=user information in UTF-8 encoded json format.
+      element: name='param', value=''
+        --> name=projectinfo
+        --> type=String
+        --> default=
+        --> comment=project information in UTF-8 encoded json format.
+      element: name='param', value=''
+        --> name=documentid
+        --> type=String
+        --> comment=Project ID; must NOT be empty
+      element: name='localvar', value=''
+        --> name=zipFile
+        --> value=ConcatPath(GetOutputDirectory(), 'document.zip');
+        --> comment=we agreed that project zip is always called 'document.zip'.
+      element: name='localvar', value=''
+        --> name=pxazFile
+        --> value=ConcatPath(GetOutputDirectory(), 'document_'++documentid++'.pxpz');
+        --> comment=Some code in openLocalProject expects the pxpz file extension. The filename should also alter if we load another document within the same session.
+      element: name='localvar', value=''
+        --> name=retvalCO
+        --> value=
+      element: name='localvar', value=''
+        --> name=projectid
+        --> value=
+      element: name='operation', value=''
+        --> active=my openList= call getLPList();        my projIdToClose= '';        my retVal= false;         if (Size(openList) gt 0) {         retVal= true;         projIdToClose= openList[0];        }        retVal;
+        element: name='callnamedop', value=''
+                --> name=closeLocalProject
+      element: name='withparam', value=''
+        --> name=projectid
+        --> value=projIdToClose;
+      element: name='operation', value=''
+        --> active=FileExists(zipFile);
+      element: name='filemove', value=''
+        --> source=${=zipFile;}
+        --> target=${=pxazFile;}
+      element: name='operation', value=''
+        element: name='callnamedop', value=''
+                --> name=customInitDocument
+      element: name='withparam', value=''
+        --> name=prototype
+        --> value=prototype;
+      element: name='withparam', value=''
+        --> name=topic
+        --> value=topic;
+      element: name='withparam', value=''
+        --> name=userinfo
+        --> value=userinfo;
+      element: name='withparam', value=''
+        --> name=projectinfo
+        --> value=projectinfo;
+      element: name='withparam', value=''
+        --> name=documentid
+        --> value=documentid;
+      element: name='operation', value=''
+      element: name='configuratormessage', value=''
+        --> wait=true
+        --> mode=call_named_op
+        --> command=initDocumentCO
+        --> id=configurator
+        --> returnvariable=retvalCO
+      element: name='withparam', value=''
+        --> name=prototype
+        --> value=prototype;
+      element: name='withparam', value=''
+        --> name=topic
+        --> value=topic;
+      element: name='withparam', value=''
+        --> name=userinfo
+        --> value=userinfo;
+      element: name='withparam', value=''
+        --> name=projectinfo
+        --> value=projectinfo;
+      element: name='operation', value=''
+        --> active=FileExists(pxazFile) and not StringContains(retvalCO, 'ERROR: ');
+        element: name='callnamedop', value=''
+                --> name=openLocalProject
+                --> returnvariable=projectid
+      element: name='withparam', value=''
+        --> name=archive
+        --> value=pxazFile;
+      element: name='returnvalue', value=''
+        --> value=my val= '';   if (StringContains(retvalCO, 'ERROR: ')) {    val= retvalCO;   }   else if (not FileExists(pxazFile)) {    val='ERROR: MISSINGPROJECT: ' ++ pxazFile;   }   else if (GetLoadedConfiguratorNode('configurator') eq null) {    val='ERROR: OPENCONFIGFAILED: ' ++ pxazFile;   }   else if (projectid eq '' or EnvValue('errorcode') ne '0') {    val='ERROR: OPENPROJFAILED: ' ++ pxazFile;   }   val;
+    element: name='namedoperation', value=''
+        --> final=true
+        --> name=saveDocument
+        --> comment=It is used to save the current configuration/project and to save it, as binary content, to Dispatcher
+      element: name='param', value=''
+        --> name=documentid
+        --> default=
+        --> type=String
+        --> comment=The project id, might be empty if the polymer connector does not support early creation of ids.
+      element: name='localvar', value=''
+        --> name=projectid
+        --> value=my projid= '';           my list= call getLPList();            if (Size(list) gt 0) {            projid= list[0];           }           else {            projid= documentid;           }           projid;
+      element: name='localvar', value=''
+        --> name=retval
+        --> value=
+      element: name='operation', value=''
+        element: name='callnamedop', value=''
+                --> name=saveWebProject
+                --> returnvariable=retval
+      element: name='returnvalue', value=''
+        --> value=LoadBinary(call getLPArchive(projectid));
+    element: name='namedoperation', value=''
+        --> final=true
+        --> name=getTableViewerData
+        --> comment=Returns header and body information of the table viewer with the given viewer id.
+      element: name='param', value=''
+        --> name=viewerid
+        --> type=String
+        --> comment=The viewer id of the table viewer.
+      element: name='operation', value=''
+        element: name='operationlist', value=''
+                --> contextviewer=${=my projectid= OpenProjectIds()[0]; return ProjectViewer(projectid,viewerid);}
+                --> returnvariable=result
+      element: name='operation', value=''
+        element: name='callnamedop', value=''
+                --> name=customGetTableViewerData
+                --> returnvariable=result
+      element: name='withparam', value=''
+        --> name=viewerid
+        --> value=viewerid;
+      element: name='operation', value=''
+        --> active=result eq null;
+      element: name='executeexpression', value=''
+        --> expression=return TableViewerInfo(viewerid, List('ci_quantity','ci_item_number', 'description', 'ci_price'));
+        --> returnvariable=result
+      element: name='returnvalue', value=''
+        --> value=result;
+      element: name='returnvalue', value=''
+        --> value=return result eq null ? ('ERROR: could not find table viewer '++viewerid) : result;
+    element: name='namedoperation', value=''
+        --> final=true
+        --> name=performTableViewerInput
+        --> comment=Simulates the editing of a table viewer cell. returns a Dictionary with status (ok, failed or error) and a failuretext.
+      element: name='param', value=''
+        --> name=viewerid
+        --> type=String
+        --> comment=The viewer id of the table viewer.
+      element: name='param', value=''
+        --> name=rowindex
+        --> type=Integer
+        --> comment=The 0-based index of the row to be modified
+      element: name='param', value=''
+        --> name=columnid
+        --> type=String
+        --> comment=The column id of the cell which should be modified.
+      element: name='param', value=''
+        --> name=value
+        --> type=String
+        --> comment=The new value to be set into the table cell.
+      element: name='operation', value=''
+        element: name='operationlist', value=''
+                --> contextviewer=${=my projectid= OpenProjectIds()[0]; return ProjectViewer(projectid,viewerid);}
+                --> returnvariable=result
+      element: name='operation', value=''
+      element: name='simulatetableviewercellinput', value=''
+        --> rowindex=rowindex;
+        --> columnid=columnid;
+        --> viewerid=${=viewerid;}
+        --> value=value;
+        --> returnvariable=result
+      element: name='returnvalue', value=''
+        --> value=result;
+      element: name='returnvalue', value=''
+        --> value=result;
+    element: name='namedoperation', value=''
+        --> name=getDatabagViewerData
+        --> comment=returns information about a databag viewer to the web frontend. This operation does not select a specific node. If the given databag viewer requires a special node to be selected, overwrite the customGetDatabagViewerData hook operation.
+      element: name='param', value=''
+        --> name=viewerid
+        --> type=String
+        --> comment=The id of the databag viewer.
+      element: name='operation', value=''
+        element: name='operationlist', value=''
+                --> contextviewer=${=my projectid= OpenProjectIds()[0]; return ProjectViewer(projectid,'projecttree');}
+                --> returnvariable=result
+      element: name='operation', value=''
+        element: name='callnamedop', value=''
+                --> name=customGetDatabagViewerData
+                --> returnvariable=result
+      element: name='withparam', value=''
+        --> name=viewerid
+        --> value=viewerid;
+      element: name='operation', value=''
+        --> active=result eq null;
+      element: name='executeexpression', value=''
+        --> expression=return DatabagViewerInfo(viewerid);
+        --> returnvariable=result
+      element: name='returnvalue', value=''
+        --> value=result;
+      element: name='returnvalue', value=''
+        --> value=return (result eq null) ? ('ERROR: could not find databag viewer '++viewerid) : result;
+    element: name='namedoperation', value=''
+        --> final=true
+        --> name=performDatabagViewerInput
+        --> comment=Simulates the editing of a databag viewer. returns a Dictionary with status (ok, failed or error) and a failuretext.
+      element: name='param', value=''
+        --> name=viewerid
+        --> type=String
+        --> comment=The viewer id of the table viewer.
+      element: name='param', value=''
+        --> name=elementid
+        --> type=String
+        --> comment=The id of the databag viewer element.
+      element: name='param', value=''
+        --> name=value
+        --> type=String
+        --> comment=The new value.
+      element: name='operation', value=''
+        element: name='operationlist', value=''
+                --> contextviewer=${=my projectid= OpenProjectIds()[0]; return ProjectViewer(projectid,'projecttree');}
+                --> returnvariable=result
+      element: name='operation', value=''
+        element: name='callnamedop', value=''
+                --> name=customPerformDatabagViewerInput
+                --> returnvariable=result
+      element: name='withparam', value=''
+        --> name=viewerid
+        --> value=viewerid;
+      element: name='withparam', value=''
+        --> name=elementid
+        --> value=elementid;
+      element: name='withparam', value=''
+        --> name=value
+        --> value=value;
+      element: name='withparam', value=''
+        --> name=fake
+      element: name='fake', value=''
+        --> name=deep
+      element: name='operation', value=''
+        --> active=result eq null;
+      element: name='simulatedatabaginput', value=''
+        --> dataelementid=${=elementid;}
+        --> viewerid=${=viewerid;}
+        --> value=value;
+        --> returnvariable=result
+      element: name='returnvalue', value=''
+        --> value=result;
+      element: name='returnvalue', value=''
+        --> value=if (result['status'] ne 'success' and result['status'] ne 'failed') {    return 'ERROR: '++result['failuretext'];   };   return result;
+    element: name='namedoperation', value=''
+        --> name=initUserInfo
+        --> final=true
+      element: name='operation', value=''
+        element: name='callnamedop', value=''
+                --> name=performDatabagViewerInput
+      element: name='withparam', value=''
+        --> name=sessionid
+        --> value=GenerateUUID();
+      element: name='withparam', value=''
+        --> name=userid
+        --> value=GetUser();
+      element: name='withparam', value=''
+        --> name=groupid
+        --> value=GetUserGroup();
