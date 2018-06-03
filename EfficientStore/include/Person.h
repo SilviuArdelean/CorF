@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "rapidjson/writer.h"
-#include "utils.h"
+#include "string_utils.h"
 
 //{
 //   "person_id":"1686053076599", 
@@ -87,12 +87,12 @@ public:
 
    bool operator > (const Person& rhs) const
    {
-      return getEpochTime(getLastUpdate()) > getEpochTime(rhs.getLastUpdate());
+      return string_utils::getEpochTime(getLastUpdate()) > string_utils::getEpochTime(rhs.getLastUpdate());
    }
 
    bool operator < (const Person& rhs) const
    {
-      return getEpochTime(getLastUpdate()) < getEpochTime(rhs.getLastUpdate());
+      return string_utils::getEpochTime(getLastUpdate()) < string_utils::getEpochTime(rhs.getLastUpdate());
    }
    
    template <typename Writer>

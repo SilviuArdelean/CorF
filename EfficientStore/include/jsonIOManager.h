@@ -5,7 +5,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/prettywriter.h" // for stringify JSON
-#include "utils.h"
+#include "string_utils.h"
 
 template<typename T, typename It>
 class jsonIOManager
@@ -56,7 +56,7 @@ public:
       std::sort(vectData.begin(), vectData.end(),
          [](const T& lhs, const T& rhs)
          {
-            return getEpochTime(lhs.getLastUpdate()) > getEpochTime(rhs.getLastUpdate());
+            return string_utils::getEpochTime(lhs.getLastUpdate()) > string_utils::getEpochTime(rhs.getLastUpdate());
          });
 
       m_dataList.clear();

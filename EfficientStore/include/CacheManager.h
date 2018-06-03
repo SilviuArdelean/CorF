@@ -1,5 +1,5 @@
 #pragma once
-#include "utils.h"
+#include "string_utils.h"
 #include "jsonIOManager.h"
 #include "fixed_queue.h"
 #include <memory>
@@ -12,7 +12,7 @@ class CacheManager
    {
       bool operator()(const T& lhs, const T& rhs) const
       {
-         return getEpochTime(lhs.getLastUpdate()) < getEpochTime(rhs.getLastUpdate());
+         return string_utils::getEpochTime(lhs.getLastUpdate()) < string_utils::getEpochTime(rhs.getLastUpdate());
       }
    };
 
@@ -35,6 +35,9 @@ public:
 
    bool Initialize()
    {
+      assert(m_jsonManager);
+      assert(m_cacheQueue);
+
       if (!m_jsonManager->LoadFile())
       {
          std::cout << "Cache initialization has fail - invalid source" << std::endl;
@@ -51,8 +54,18 @@ public:
       return true;
    }
 
+   void Save(const std::string& newFilePath)
+   {
+      assert(m_jsonManager);
+
+      m_jsonManager->Save2File(newFilePath);
+   }
+
    void AddItem(const T& new_pers)
    {
+      assert(m_jsonManager);
+      assert(m_cacheQueue);
+
       if (m_cacheQueue->is_full())
             m_cacheQueue->pop();
 
@@ -64,12 +77,18 @@ public:
 
    void DeleteItem(const std::string& person_id)
    {
+      assert(m_jsonManager);
+      assert(m_cacheQueue);
+
       m_cacheQueue->erase(person_id);
       m_jsonManager->Delete(person_id);
    }
 
    T* SearchItem(const std::string& person_id)
    {
+      assert(m_jsonManager);
+      assert(m_cacheQueue);
+
       auto ptr2pers = m_cacheQueue->find(person_id);
       return (nullptr != ptr2pers)
                ? ptr2pers

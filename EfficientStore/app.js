@@ -4,11 +4,11 @@ var bodyParser = require('body-parser')
 var app = express();
 app.use(express.static(__dirname + '/'));
 
-if (process.env.DEBUG) {
-  const addon = require('./cpp/build/Debug/engine_addon');
-} else {
+//if (process.env.DEBUG) {
+//  const addon = require('./cpp/build/Debug/engine_addon');
+//} else {
   const addon = require('./cpp/build/Release/engine_addon');
-}
+//}
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
@@ -35,9 +35,11 @@ app.post('/addnewitem', urlencodedParser, function (req, res)  {
 	res.write("<br>		name: " + req.body.name);
 	res.write("<br>		surname: " + req.body.surname);
 	res.write("<br>		email: " + req.body.email);
-	res.write("<br>}"); 
+   res.write("<br>}"); 
+   res.end();
 
-	res.end();
+   addon.addItem(req.body.person_id, req.body.name, req.body.surname, req.body.email);
+   
 });
 
 app.post('/search', urlencodedParser, function (req, res) {
@@ -61,5 +63,7 @@ app.post('/deletekey', urlencodedParser, function (req, res)  {
 
 	res.end();
 });
+
+addon.initEngine();
 
 app.listen(3000); 

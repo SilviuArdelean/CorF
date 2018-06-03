@@ -41,7 +41,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="engine.cpp">
+    <ClCompile Include="engineTester.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

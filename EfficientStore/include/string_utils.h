@@ -57,16 +57,6 @@ class string_utils
 		return (pos != std::string::npos);
 	}
 
-	//static bool is_number(const std::string& s)
-	//{
-	//	return (!s.empty() && 
-	//				std::find_if(s.begin(), s.end(), 
-	//							[](TCHAR c) 
-	//							{ 
-	//								return !std::isdigit(c); 
-	//							}) == s.end());
-	//}
-	
 	static std::string actual_time()
 	{
 	   time_t now = time(nullptr);
@@ -103,5 +93,15 @@ class string_utils
 	   return std::mktime(&dt);
 	}
 
+   static std::string actual_time2string()
+   {
+      time_t now = time(nullptr);
+
+      char buf[64] = { 0 };
+      auto tstruct = *localtime(&now);
+
+      strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tstruct);
+      return buf;
+   }
 
 };
