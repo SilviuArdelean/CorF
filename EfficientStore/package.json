@@ -1,0 +1,13 @@
+{
+  "name": "efficient-store",
+  "version": "0.0.0",
+  "description": "Efficient Key-Value-Store",
+  "main": "app.js",
+  "author": {
+    "name": "silviu"
+  },
+  "dependencies": {
+    "express": "^4.16.3",
+    "server.js": "^1.0.0"
+  }
+}

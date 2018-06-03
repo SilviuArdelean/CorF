@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<!-- Template by quackit.com -->
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Store</title>		
+		
+		<style type="text/css">
+		
+			body {
+				margin:10;
+				padding:0;
+				font-family: Sans-Serif;
+				line-height: 1.5em;
+			}
+			
+			#header {
+				background: #8e95f8;
+				height: 100px;
+			}
+			
+			#header h1 {
+				margin: 0;
+				padding-top: 15px;
+			}
+			
+			main {
+				padding-bottom: 10010px;
+				margin-bottom: -10000px;
+				float: left;
+				width: 100%;
+			}
+			
+			#nav {
+				padding-bottom: 10010px;
+				margin-bottom: -10000px;
+				float: left;
+				width: 230px;
+				margin-left: -100%;
+				background: #d7d8f1;
+			}
+			
+			#footer {
+				clear: left;
+				width: 100%;
+				background: #777ff3;
+				text-align: center;
+				padding: 4px 0;
+			}
+	
+			#wrapper {
+				overflow: hidden;
+			}
+						
+			#content {
+				margin-left: 230px; /* Same as 'nav' width */
+			}
+			
+			.innertube {
+				margin: 15px; /* Padding for content */
+				margin-top: 0;
+				margin-left: 10;
+			}
+		
+			p {
+				color: #555;
+			}
+	
+			nav ul {
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+			
+			nav ul a {
+				color: darkgreen;
+				text-decoration: none;
+			}
+		
+		</style>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script>
+			  function requierments() {
+				  var requestText="<h3>Challenge</h3> <p/>  The challenge is to create an efficient, performance optimized key-value-store by making use of modern C++. With this pplication, users should be able to add or update values by key, retrieve values by key and delete values by key. <p/> For demonstration purposes the application should be network-accessible. Please also provide a client for which you can use any library or language. <p/> <h2>Requirements</h2> <p/>The following functionalities should be implemented: <h3>Interface</h3> <li> Keys are strings, values are strings as well. Both have variable length</li> <li> A “PUT” call which adds a pair to the store <li> A “DELETE” call which deletes a pair from the store by key</li> <li> A “GET” call which retrieves a pair from the store by key</li> <h3>Internal functionalities:</h3> <li> Multiple clients can access the KV-Store simultaneously (multi-threaded/synchronization)</li> <li>A cache eviction strategy should be implemented. The server should be constrained to a certain amount of memory (e.g. 10 MB). When this amount is reached, it should evict keys based on this strategy (e.g. FIFO, LRU, …)</li> <li>Instead of evicting the cache keys, they should be swapped out of memory onto a persisting storage (e.g. disk) and picked up when they are required again</li>";
+
+				$("#content_inner").html(requestText);
+			  }
+		</script>	
+		
+		<script>               
+			$(document).ready(function(){
+				requierments();
+				
+				$("#load_json").click(function(){
+					alert("load the json");										
+				});
+				
+				$("#new_item").click(function(){	
+					$("#content").load('add.html');
+				});
+				
+				$("#search_item").click(function(){
+					$("#content").load('search.html');
+				});
+				
+				$("#delete_item").click(function(){
+					$("#content").load('delete.html');
+				});
+				
+			});
+		</script>	
+	</head>
+	
+	<body>		
+
+		<header id="header">
+			<div class="innertube">
+				<h1>Efficient Key-Value-Store</h1>
+			</div>
+		</header>
+		
+		<div id="wrapper">
+		
+			<main>
+				<div id="content">
+					<div class="innertube" id="content_inner">
+						
+					</div>
+				</div>
+			</main>
+			
+			<nav id="nav">
+				<div class="innertube">
+					<h3>Initialize</h3>
+					<ul>
+						<li id = "load_json"><a href="#">Load JSON DB</a></li>
+					</ul>
+					<h3>Operations</h3>
+					<ul>						
+						<li> <a href="#content" id="new_item">Add (put)</a></li>
+						<li> <a href="#content" id="search_item">Search (get)</a></li>
+						<li> <a href="#content" id="delete_item">Delete</a></li>
+					</ul>
+				</div>
+			</nav>
+		
+		</div>
+		
+		<footer id="footer">
+			<div class="innertube">
+				<p>Coding is fun! :) </p><p>@Silviu</p>
+			</div>
+		</footer>
+	
+	</body>
+</html>

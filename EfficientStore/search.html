@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<script>
+		$(document).ready(function() 
+		{
+			$('#search4key').on('submit', function(e) {
+			  	e.preventDefault(); // Prevents the page from refreshing
+
+			 	$.ajax({
+		            url : $(this).attr('action') || window.location.pathname,
+		            type: "POST",
+		            data: $(this).serialize(),
+		            success: function (data) {
+		                $("#search_response").html(data);
+		            },
+		            error: function (jXHR, textStatus, errorThrown) {
+		                alert(errorThrown);
+		            }
+		        });
+			});
+		});
+	</script>
+</head>
+
+<body>
+  <div style="margin-left:10px; margin-top: 10px;">
+	  
+	  <h2>Search for specific item</h2>
+	  
+	  <form id="search4key" method="post" action="/search">
+	      <label for="keywords_lable">Enter keyword: </label>
+	      <input id="keywords" type="text" name="search_text">
+	      <button type="submit" value="SearchSubmit">Search</button>
+	  </form>
+
+	  <p><u>Search results:</u></p>
+
+	  <div id="search_response">No query yet.</div>
+
+  </div>
+
+</body>
+</html>

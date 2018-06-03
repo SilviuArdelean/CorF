@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<script>
+		$(document).ready(function() 
+		{
+			
+
+			$('#add_new_item').on('submit', function(e) {
+			  	e.preventDefault(); // Prevents the page from refreshing
+
+
+			 	$.ajax({
+		            url : $(this).attr('action') || window.location.pathname,
+		            type: "POST",
+		            data: $(this).serialize(),
+		            success: function (data) {
+		                $("#add_response").html(data);
+		            },
+		            error: function (jXHR, textStatus, errorThrown) {
+		                alert(errorThrown);
+		            }
+		        });
+			});
+
+//			$("#submit_new_item").click(function() {
+//				/* Single line Reset function executes on click of Reset Button */
+//				$("#add_new_item")[0].reset();
+//			});
+		});
+	</script>
+</head>
+<body>
+
+<div style="margin-left:10px; margin-top: 10px;">
+
+	<h2>Add New Item</h2>
+
+	<form id="add_new_item" method="POST" action="/addnewitem">
+	  Person ID:
+	  <br><input type="text" name="person_id" style="width:250px;">
+	  <br>
+	  Name:
+	  <br><input type="text" name="name" style="width:250px;">
+	  <br>
+	  Surname:
+	  <br><input type="text" name="surname" style="width:250px;">
+	  <br>
+	  Email:
+	  <br><input type="text" name="email" style="width:250px;">
+	  <br><br>
+     
+	  <input id="submit_new_item" type="submit" value="Add">
+	</form> 
+
+	<h2>Response from server</h2>
+
+	<div id="add_response"></div>
+
+</div>
+
+</body>
+</html>

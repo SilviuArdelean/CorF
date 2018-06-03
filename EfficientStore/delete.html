@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<script>
+		$(document).ready(function() 
+		{
+			$('#delete_form').on('submit', function(e) {
+			  	e.preventDefault(); // Prevents the page from refreshing
+
+			 	$.ajax({
+		            url : $(this).attr('action') || window.location.pathname,
+		            type: "POST",
+		            data: $(this).serialize(),
+		            success: function (data) {
+		                $("#delete_response").html(data);
+		            },
+		            error: function (jXHR, textStatus, errorThrown) {
+		                alert(errorThrown);
+		            }
+		        });
+			});
+		});
+	</script>
+</head>
+
+<body>
+
+<div style="margin-left:10px; margin-top: 10px;">
+
+<h2>Delete specific item</h2>
+	
+	
+	<form id="delete_form" method="POST" action="/deletekey">
+	  Please specify a key to delete:<br>
+	  <input type="text" name="key2delete" style="width:250px;">
+	  <br><br>
+	  <input id="submit_delete_item" type="submit" value="Delete">
+	</form> 
+
+	<div id="delete_response"></div>
+
+</div>
+
+</body>
+</html>
