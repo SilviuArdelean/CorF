@@ -6,12 +6,6 @@
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/prettywriter.h" // for stringify JSON
 #include "utils.h"
-#include "Person.h"
-
-//#ifdef _WIN32
-//#include "Shlwapi.h"
-//#include <windows.h>
-//#endif
 
 template<typename T, typename It>
 class jsonIOManager
@@ -23,18 +17,11 @@ public:
       : m_jsonFilePath(jsonFilePath)
       , m_strFileSaveAs("")
    {
-//#ifdef _WIN32
-//      if (1 != PathFileExistsA(jsonFilePath.c_str()))
-//      {
-//         std::cout << "Incorrect file path: " << jsonFilePath << std::endl;
-//      }
-//#endif
    }
 
    ~jsonIOManager()
    {
       // Force saving data to file - RTTI based stuff
-
       Save2File(m_strFileSaveAs.empty() ? m_jsonFilePath : m_strFileSaveAs);
    }
 
@@ -143,10 +130,10 @@ protected:
 
       writer.StartArray();
 
-      for (auto& person : m_dataList)
+      for (auto& item : m_dataList)
       {
          writer.StartObject();
-         person.Serialize(writer);
+         item.Serialize(writer);
          writer.EndObject();
       }
 
