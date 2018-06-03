@@ -4,7 +4,7 @@
 #include "fixed_queue.h"
 #include <memory>
 
-template <typename T>
+template <typename T, typename It>
 class CacheManager
 {
 
@@ -25,7 +25,7 @@ public:
    {
       m_cacheQueue = new fixed_queue<T, std::deque<T>, LessThanByFileSize>(m_cacheSize);
 
-      m_jsonManager = new jsonIOManager<T>(consistDataFilePath);
+      m_jsonManager = new jsonIOManager<T, It>(consistDataFilePath);
    }
    ~CacheManager()
    {
@@ -81,5 +81,5 @@ private:
 
    fixed_queue<T, std::deque<T>, LessThanByFileSize>* m_cacheQueue;
 
-   jsonIOManager<T>* m_jsonManager;
+   jsonIOManager<T, It>* m_jsonManager;
 };

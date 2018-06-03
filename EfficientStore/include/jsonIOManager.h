@@ -13,7 +13,7 @@
 //#include <windows.h>
 //#endif
 
-template<typename T>
+template<typename T, typename It>
 class jsonIOManager
 {
 public:
@@ -118,22 +118,6 @@ public:
       auto item_iter = m_lookupTable.find(pers_id);
 
       return (item_iter != m_lookupTable.end()) ? &*item_iter->second : nullptr;
-
-/*    // unoptimized approach
-      auto it = m_dataList.begin();
-      while (it != m_dataList.end())
-      {
-         T *item = &*it;
-         if (string_utils::compare_case_sensitive(item->getPersonalID(), pers_id))
-         {
-            return item;
-         }
-
-         ++it;
-      }
-
-      return nullptr;
-*/
    }
 
    bool Delete(std::string const& pers_id)
@@ -148,23 +132,6 @@ public:
       }
 
       return false;
-
-/*    // unoptimized approach
-      auto it = m_dataList.begin();
-      while (it != m_dataList.end())
-      {
-         T *item = &*it;
-         if (string_utils::compare_case_sensitive(item->getPersonalID(), pers_id))
-         {
-            m_dataList.erase(it);
-            return true;
-         }
-
-         ++it;
-      }
-
-      false;
-   */
    }
 
 
@@ -192,5 +159,6 @@ private:
 
    rapidjson::Document  m_docJson;
    std::list<T>        m_dataList;
-   std::unordered_map< std::string, std::list<Person>::iterator >  m_lookupTable;
+
+   std::unordered_map< std::string, It >  m_lookupTable;
 };
