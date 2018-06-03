@@ -13,7 +13,7 @@ class fixed_queue : public std::priority_queue<_Ty, _Container, _Pr>
 
 public:
    fixed_queue() {}
-   fixed_queue(unsigned int size)
+   fixed_queue(size_t size)
       : fixed_size(size)
    {
    }
@@ -91,11 +91,5 @@ public:
 
 	
 private:
-	const unsigned int fixed_size;
-
-	// Prevent heap allocation
-//	void * operator new(size_t) = delete;
-//	void * operator new[](size_t) = delete;
-//	void   operator delete   (void *) = delete;
-//	void   operator delete[](void*) = delete;
+	const size_t fixed_size;
 };

@@ -42,3 +42,4 @@ Debug/
 Release/
 engineTester/.vs/
 engineTester/x64/
+nodeModules/

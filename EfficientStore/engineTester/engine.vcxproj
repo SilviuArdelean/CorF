@@ -73,15 +73,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>..\bin;$(ExecutablePath)</ExecutablePath>
+    <OutDir>$(SolutionDir)bin</OutDir>
+    <IncludePath>.\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>..\bin64;$(ExecutablePath)</ExecutablePath>
+    <OutDir>$(SolutionDir)bin64\</OutDir>
+    <IncludePath>.\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <ExecutablePath>..\bin;$(ExecutablePath)</ExecutablePath>
+    <OutDir>$(SolutionDir)bin</OutDir>
+    <IncludePath>.\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <ExecutablePath>..\bin64;$(ExecutablePath)</ExecutablePath>
+    <OutDir>$(SolutionDir)bin64\</OutDir>
+    <IncludePath>.\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -152,12 +164,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CacheManager.h" />
+    <ClInclude Include="..\include\CacheManager.h" />
+    <ClInclude Include="..\include\fixed_queue.h" />
+    <ClInclude Include="..\include\jsonIOManager.h" />
+    <ClInclude Include="..\include\Person.h" />
     <ClInclude Include="include\fixed_queue.h" />
     <ClInclude Include="include\general.h" />
     <ClInclude Include="include\string_utils.h" />
-    <ClInclude Include="jsonIOManager.h" />
-    <ClInclude Include="Person.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>

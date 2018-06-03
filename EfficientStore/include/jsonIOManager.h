@@ -6,13 +6,14 @@
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/prettywriter.h" // for stringify JSON
 #include "utils.h"
+#include "Person.h"
 
 //#ifdef _WIN32
 //#include "Shlwapi.h"
 //#include <windows.h>
 //#endif
 
-template<class T>
+template<typename T>
 class jsonIOManager
 {
 public:
@@ -71,12 +72,27 @@ public:
             return getEpochTime(lhs.getLastUpdate()) > getEpochTime(rhs.getLastUpdate());
          });
 
-      m_dataQueue.clear();
+      m_dataList.clear();
 
-      std::move( std::begin(vectData), std::end(vectData), std::back_inserter(m_dataQueue));
+      std::move( std::begin(vectData), std::end(vectData), std::back_inserter(m_dataList));
       vectData.clear();
 
+      InitLookupTable();
+
       return true;
+   }
+
+   void InitLookupTable()
+   {
+      auto it = m_dataList.begin();
+      m_lookupTable.reserve(m_dataList.size());
+
+      while (it != m_dataList.end())
+      {
+         T *item = &*it;
+         m_lookupTable[it->getPersonalID()] = it;
+         ++it;
+      }
    }
 
    void Save2File(const std::string& newFilePath)
@@ -94,13 +110,18 @@ public:
       fclose(file);
    }
 
-   std::deque<T>& GetConsistentDataQueue()  { return  m_dataQueue; }
-   void Add(const T& pers) { m_dataQueue.push_front(pers); }
+   std::list<T>& GetConsistentDataList()  { return  m_dataList; }
+   void Add(const T& pers) { m_dataList.push_front(pers); }
    
    T* Find(const std::string& pers_id)
    { 
-      auto it = m_dataQueue.begin();
-      while (it != m_dataQueue.end())
+      auto item_iter = m_lookupTable.find(pers_id);
+
+      return (item_iter != m_lookupTable.end()) ? &*item_iter->second : nullptr;
+
+/*    // unoptimized approach
+      auto it = m_dataList.begin();
+      while (it != m_dataList.end())
       {
          T *item = &*it;
          if (string_utils::compare_case_sensitive(item->getPersonalID(), pers_id))
@@ -112,17 +133,30 @@ public:
       }
 
       return nullptr;
+*/
    }
 
    bool Delete(std::string const& pers_id)
    {
-      auto it = m_dataQueue.begin();
-      while (it != m_dataQueue.end())
+      auto item_iter = m_lookupTable.find(pers_id);
+
+      if (item_iter != m_lookupTable.end())
+      {
+         m_dataList.erase(item_iter);
+         m_lookupTable.erase(item_iter);
+         return true;
+      }
+
+      return false;
+
+/*    // unoptimized approach
+      auto it = m_dataList.begin();
+      while (it != m_dataList.end())
       {
          T *item = &*it;
          if (string_utils::compare_case_sensitive(item->getPersonalID(), pers_id))
          {
-            m_dataQueue.erase(it);
+            m_dataList.erase(it);
             return true;
          }
 
@@ -130,6 +164,7 @@ public:
       }
 
       false;
+   */
    }
 
 
@@ -141,7 +176,7 @@ protected:
 
       writer.StartArray();
 
-      for (auto& person : m_dataQueue)
+      for (auto& person : m_dataList)
       {
          writer.StartObject();
          person.Serialize(writer);
@@ -156,6 +191,6 @@ private:
    std::string          m_strFileSaveAs;
 
    rapidjson::Document  m_docJson;
-   std::deque<T>        m_dataQueue;
+   std::list<T>        m_dataList;
+   std::unordered_map< std::string, std::list<Person>::iterator >  m_lookupTable;
 };
-

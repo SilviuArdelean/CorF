@@ -42,7 +42,7 @@ public:
       }
 
       // fill the cache queue
-      for (auto &ob : m_jsonManager->GetConsistentDataQueue())
+      for (auto &ob : m_jsonManager->GetConsistentDataList())
       {
          m_cacheQueue->push(T(ob.getPersonalID(), ob.getName(),
                                     ob.getSurname(), ob.getEmail(), ob.getLastUpdate()));
@@ -79,7 +79,7 @@ public:
 private:
    size_t   m_cacheSize;
 
-   fixed_queue<T, std::deque<T>, LessThanByFileSize>* m_cacheQueue; // replace Person by a template
+   fixed_queue<T, std::deque<T>, LessThanByFileSize>* m_cacheQueue;
 
    jsonIOManager<T>* m_jsonManager;
 };
