@@ -42,4 +42,4 @@ Debug/
 Release/
 engineTester/.vs/
 engineTester/x64/
-nodeModules/
+node_modules/
