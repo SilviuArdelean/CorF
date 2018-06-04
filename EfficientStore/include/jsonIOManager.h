@@ -76,7 +76,6 @@ public:
 
       while (it != m_dataList.end())
       {
-         T *item = &*it;
          m_lookupTable[it->getPersonalID()] = it;
          ++it;
       }
@@ -98,7 +97,14 @@ public:
    }
 
    std::list<T>& GetConsistentDataList()  { return  m_dataList; }
-   void Add(const T& pers) { m_dataList.push_back(pers); }
+   
+   void Add(const T& pers) 
+   { 
+      m_dataList.push_front(pers); 
+
+      auto it_new = m_dataList.begin();
+      m_lookupTable[it_new->getPersonalID()] = it_new;
+   }
    
    T* Find(const std::string& pers_id)
    { 

@@ -11,7 +11,7 @@ using namespace v8;
 #define DATA_FILE                   "data\\persons_new.json"
 #define DATA_FILE_OUTPUT_TESTONLY   "data\\persons_new_test.json"
 
-CacheManager<Person, std::list<Person>::iterator> manager(DATA_FILE, CACHE_SIZE);
+CacheManager<Person> manager(DATA_FILE, CACHE_SIZE);
 
 void initEngine(const FunctionCallbackInfo<Value>& args) 
 {
