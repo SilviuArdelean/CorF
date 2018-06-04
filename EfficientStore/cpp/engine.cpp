@@ -8,8 +8,8 @@
 using namespace v8;
 
 #define CACHE_SIZE 100
-#define DATA_FILE                   "data\\persons_new.json"
-#define DATA_FILE_OUTPUT_TESTONLY   "data\\persons_new_test.json"
+#define DATA_FILE                   "data\\persons.json"
+#define DATA_FILE_OUTPUT_TESTONLY   "data\\persons_saveas.json"
 
 CacheManager<Person> manager(DATA_FILE, CACHE_SIZE);
 
@@ -20,7 +20,7 @@ void initEngine(const FunctionCallbackInfo<Value>& args)
       std::cout << "Failed to initialize the cache memory" << std::endl;
    }
 
-   manager.SetSaveAsFileName(DATA_FILE_OUTPUT_TESTONLY);
+   manager.SetSaveAsFileName(DATA_FILE);
 }
 
 void addItem(const FunctionCallbackInfo<Value>& args)
@@ -37,32 +37,74 @@ void addItem(const FunctionCallbackInfo<Value>& args)
 
    auto    strLastUpdate = string_utils::actual_time2string();
 
-   std::cout << "Add new item: " << strPersonID << "   " << strName << "   " << strSurname << "   " << strEmail << std::endl;
-
+   
+   std::string str_ui_response;
    Person pers(strPersonID, strName, strSurname, strEmail, strLastUpdate);
-   manager.AddItem(pers);
-   manager.Save(DATA_FILE_OUTPUT_TESTONLY);
-}
+   
+   if (manager.AddItem(pers))
+   {
+      str_ui_response = "The person ID: " + strPersonID + " was added.";
+      str_ui_response += "<br>--------------------------------------------------------";
+      str_ui_response += "<br> Name          : " + strName;
+      str_ui_response += "<br> Surname       : " + strSurname;
+      str_ui_response += "<br> Email         : " + strEmail;
+      str_ui_response += "<br> Last Update   : " + strLastUpdate;
 
-void deleteItem(const FunctionCallbackInfo<Value>& args)
-{
-   v8::String::Utf8Value personID(args[0]->ToString());
-   std::string    strPersonID = std::string(*personID);
+      manager.Save(DATA_FILE);
+   }
+   else {
+      str_ui_response = "<br> Person ID [" + strPersonID + "] already exists!";
+   }
+   
+   Isolate* isolate = args.GetIsolate();
+   Local<String>  retval = String::NewFromUtf8(isolate, str_ui_response.c_str());
+   args.GetReturnValue().Set(retval);
 }
 
 void effectiveSearch(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
   
   v8::String::Utf8Value search_string(args[0]->ToString());
+  std::string search_pid = std::string(*search_string);
+  std::string str_ui_response;
 
-  std::string from = std::string(*search_string);
+  auto results = manager.SearchItem(search_pid);
+  if (nullptr == results)
+  {
+     str_ui_response = "<br> No result(s) found for person ID (" + search_pid + ")!";
+  }
+  else
+  {
+     str_ui_response  = "Found the person ID: " + search_pid;
+     str_ui_response += "<br>--------------------------------------------------------";
+     str_ui_response += "<br> Name          : " + results->getName();
+     str_ui_response += "<br> Surname       : " + results->getSurname();
+     str_ui_response += "<br> Email         : " + results->getEmail();
+     str_ui_response += "<br> Last Update   : " + results->getLastUpdate();
+  }
 
-  auto response = std::string("#search_engine_addon received to search for: ") + from;
-
-  Local<String>  retval = String::NewFromUtf8(isolate, response.c_str());
+  Local<String>  retval = String::NewFromUtf8(isolate, str_ui_response.c_str());
   args.GetReturnValue().Set(retval);
 }
 
+void deleteItem(const FunctionCallbackInfo<Value>& args)
+{
+   v8::String::Utf8Value personID(args[0]->ToString());
+   std::string    strPersonID = std::string(*personID);
+   std::string str_ui_response;
+
+   if (manager.DeleteItem(strPersonID))
+   {
+      str_ui_response = "<br> The person ID: [" + strPersonID + "] was deleted!";
+   }
+   else {
+      str_ui_response = "<br> The person ID: [" + strPersonID + "] does not exists!";
+   }
+
+   Isolate* isolate = args.GetIsolate();
+   Local<String>  retval = String::NewFromUtf8(isolate, str_ui_response.c_str());
+   args.GetReturnValue().Set(retval);
+}
 
 
 void init(Local<Object> exports) {

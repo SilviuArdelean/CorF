@@ -27,9 +27,9 @@ app.post('/addnewitem', urlencodedParser, function (req, res)  {
    console.log("	email: " + req.body.email);
    console.log("}");
 
-   addon.addItem(req.body.person_id, req.body.name, req.body.surname, req.body.email);
+   var add_result = addon.addItem(req.body.person_id, req.body.name, req.body.surname, req.body.email);
 
-   res.write("The new person ( " + req.body.name + "  " + req.body.surname +" ) was added.");   
+   res.write(add_result);
    res.end();   
 });
 
@@ -37,20 +37,24 @@ app.post('/search', urlencodedParser, function (req, res) {
 
    var search_string = req.body.search_text;
 
-   var addon_result = addon.effectiveSearch(search_string);
+   var search_result = addon.effectiveSearch(search_string);
 
-   console.log("Search request for: { key = " + req.body.key2delete + " } "); 
+   console.log("Search request for: { key = " + search_string + " } "); 
+   console.log("--------------------------------------------------------");
+   console.log("Search result: " + search_result);
 
-   res.write("Search request for: " + addon_result);
+   res.write(search_result);
+
    res.end();
 });
 
 app.post('/deletekey', urlencodedParser, function (req, res)  {
-	var search_string = req.body.search_text;
 	
-	console.log("Delete request=: { key: " + req.body.key2delete + " } "); 
+	console.log("Delete request { key: " + req.body.key2delete + " } "); 
 
-	res.write("The server has received a delete request for : { key = " + req.body.key2delete + " } "); 
+   var delete_result = addon.deleteItem(req.body.key2delete);
+
+   res.write(delete_result); 
 
 	res.end();
 });

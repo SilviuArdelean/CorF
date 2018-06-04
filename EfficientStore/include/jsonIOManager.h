@@ -98,12 +98,21 @@ public:
 
    std::list<T>& GetConsistentDataList()  { return  m_dataList; }
    
-   void Add(const T& pers) 
+   bool Add(const T& pers) 
    { 
+      auto it = m_lookupTable.find(pers.getPersonalID());
+      if (it != m_lookupTable.end())
+      {
+         std::cout << "Person ID " << pers.getPersonalID() << " already exists" << std::endl;
+         return false;
+      }
+
       m_dataList.push_front(pers); 
 
       auto it_new = m_dataList.begin();
       m_lookupTable[it_new->getPersonalID()] = it_new;
+
+      return true;
    }
    
    T* Find(const std::string& pers_id)

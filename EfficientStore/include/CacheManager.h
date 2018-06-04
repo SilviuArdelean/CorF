@@ -60,7 +60,7 @@ public:
       m_jsonManager->Save2File(newFilePath);
    }
 
-   void AddItem(const T& new_pers)
+   bool AddItem(const T& new_pers)
    {
       assert(m_jsonManager);
       assert(m_cacheQueue);
@@ -69,22 +69,21 @@ public:
             m_cacheQueue->pop();
 
       m_cacheQueue->push(new_pers);
-      m_jsonManager->Add(new_pers);
 
-      // force write on disk m_jsonManager - reinitialize cache_queue
+      return m_jsonManager->Add(new_pers);
    }
 
-   void DeleteItem(const std::string& person_id)
+   bool DeleteItem(const std::string& person_id)
    {
       assert(m_jsonManager);
       assert(m_cacheQueue);
 
       m_cacheQueue->erase(person_id, 
-                            [&](std::string const& id, Iter itR)-> bool {
-                                  return (string_utils::compare_case_sensitive(id, itR->getPersonalID()));
-                           });
+                             [&](std::string const& id, Iter itR)-> bool {
+                                     return (string_utils::compare_case_sensitive(id, itR->getPersonalID()));
+                             });
 
-      m_jsonManager->Delete(person_id);
+      return m_jsonManager->Delete(person_id);
    }
 
    T* SearchItem(const std::string& person_id)
