@@ -16,6 +16,7 @@
 		            data: $(this).serialize(),
 		            success: function (data) {
 		                $("#search_response").html(data);
+		                $('#search4key').trigger("reset");
 		            },
 		            error: function (jXHR, textStatus, errorThrown) {
 		                alert(errorThrown);

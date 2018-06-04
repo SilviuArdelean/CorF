@@ -19,11 +19,7 @@
 		<script>               
 			$(document).ready(function(){
 				requierments();
-				
-				$("#load_json").click(function(){
-					alert("load the json");										
-				});
-				
+								
 				$("#new_item").click(function(){	
 					$("#content").load('add.html');
 				});
@@ -60,10 +56,6 @@
 			
 			<nav id="nav">
 				<div class="innertube">
-					<h3>Initialize</h3>
-					<ul>
-						<li id = "load_json"><a href="#">Load JSON DB</a></li>
-					</ul>
 					<h3>Operations</h3>
 					<ul>						
 						<li> <a href="#content" id="new_item">Add (put)</a></li>

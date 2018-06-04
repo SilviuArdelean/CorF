@@ -64,7 +64,7 @@
     "v8_trace_maps": 0,
     "v8_use_snapshot": "true",
     "want_separate_host_toolset": 0,
-    "nodedir": "C:\\Users\\silvi\\.node-gyp\\8.11.2",
+    "nodedir": "C:\\Users\\silviu.ardelean\\.node-gyp\\8.11.2",
     "standalone_static_library": 1,
     "msbuild_path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Professional\\MSBuild\\15.0\\Bin\\MSBuild.exe"
   }

@@ -18,6 +18,7 @@
 		            data: $(this).serialize(),
 		            success: function (data) {
 		                $("#add_response").html(data);
+		                $('#add_new_item').trigger("reset");
 		            },
 		            error: function (jXHR, textStatus, errorThrown) {
 		                alert(errorThrown);
