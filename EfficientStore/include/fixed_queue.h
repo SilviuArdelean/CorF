@@ -40,12 +40,16 @@ public:
       {
          _PQ_specialization::emplace(x);
       }
+
    }
 
 
    void pop()
    {
-      _PQ_specialization::c.pop_front();
+      auto itFirst = _PQ_specialization::c.begin();
+
+      if (itFirst != _PQ_specialization::c.end())
+         _PQ_specialization::c.erase(itFirst);
    }
 
    void clear()
@@ -53,13 +57,13 @@ public:
       _PQ_specialization::c.clear();
    }
 
-   bool erase(std::string const& pers_id)
+   template
+      <typename Comparator>
+   bool erase(std::string const& str_id, Comparator &&comp)
    {
       for (auto it = _PQ_specialization::c.begin(); it != _PQ_specialization::c.end(); ++it)
       {
-         _Ty *pers = &*it;
-         
-         if (string_utils::compare_case_sensitive( pers->getPersonalID(), pers_id))
+         if (comp(str_id, it))
          {
             _PQ_specialization::c.erase(it);
             return true;
@@ -69,27 +73,30 @@ public:
       return false;
    }
 
-   _Ty* find(std::string const& pers_id)
+   template 
+    <typename Comparator>
+   _Ty* find(std::string str_id, Comparator &&comp)
    {
       for (auto it = _PQ_specialization::c.begin(); it != _PQ_specialization::c.end(); ++it)
       {
-         _Ty *pers = &*it;
-
-         if (string_utils::compare_case_sensitive(pers->getPersonalID(), pers_id))
+         if (comp(str_id, it))
          {
-            return pers;
+            return &*it;
          }
       }
 
       return nullptr;
    }
 
+   size_t   size() const { return _PQ_specialization::c.size(); }
+   bool     is_full() const {      return fixed_size == _PQ_specialization::c.size();    }
 
-   size_t size() const { return _PQ_specialization::c.size(); }
+   auto     begin() -> decltype(_PQ_specialization::c.begin()) { return  _PQ_specialization::c.begin(); }
+   auto     cbegin() -> decltype(_PQ_specialization::c.cbegin()) { return  _PQ_specialization::c.cbegin(); }
 
-   bool is_full() {      return fixed_size == _PQ_specialization::c.size();    }
+   auto     end() -> decltype(_PQ_specialization::c.end()) { return  _PQ_specialization::c.end(); }
+   auto     cend() -> decltype(_PQ_specialization::c.cend()) { return  _PQ_specialization::c.cend(); }
 
-	
 private:
 	const size_t fixed_size;
 };

@@ -7,7 +7,7 @@
 #include "rapidjson/prettywriter.h" // for stringify JSON
 #include "string_utils.h"
 
-template<typename T, typename It>
+template<typename T, typename Iter>
 class jsonIOManager
 {
 public:
@@ -98,7 +98,7 @@ public:
    }
 
    std::list<T>& GetConsistentDataList()  { return  m_dataList; }
-   void Add(const T& pers) { m_dataList.push_front(pers); }
+   void Add(const T& pers) { m_dataList.push_back(pers); }
    
    T* Find(const std::string& pers_id)
    { 
@@ -107,13 +107,14 @@ public:
       return (item_iter != m_lookupTable.end()) ? &*item_iter->second : nullptr;
    }
 
-   bool Delete(std::string const& pers_id)
+   bool Delete(const std::string& pers_id)
    {
       auto item_iter = m_lookupTable.find(pers_id);
 
       if (item_iter != m_lookupTable.end())
       {
-         m_dataList.erase(item_iter);
+         m_dataList.erase(item_iter->second);
+
          m_lookupTable.erase(item_iter);
          return true;
       }
@@ -144,8 +145,10 @@ private:
    std::string          m_jsonFilePath;
    std::string          m_strFileSaveAs;
 
-   rapidjson::Document  m_docJson;
-   std::list<T>        m_dataList;
+   typedef typename std::list<T>::iterator  Iter;
 
-   std::unordered_map< std::string, It >  m_lookupTable;
+   rapidjson::Document  m_docJson;
+   std::list<T>         m_dataList;
+
+   std::unordered_map< std::string, Iter >  m_lookupTable;
 };

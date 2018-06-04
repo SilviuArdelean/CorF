@@ -168,7 +168,6 @@
     <ClInclude Include="..\include\fixed_queue.h" />
     <ClInclude Include="..\include\jsonIOManager.h" />
     <ClInclude Include="..\include\Person.h" />
-    <ClInclude Include="include\fixed_queue.h" />
     <ClInclude Include="include\general.h" />
     <ClInclude Include="include\string_utils.h" />
     <ClInclude Include="targetver.h" />

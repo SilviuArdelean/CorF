@@ -4,11 +4,10 @@
 #include "fixed_queue.h"
 #include <memory>
 
-template <typename T, typename It>
+template <typename T>
 class CacheManager
 {
-
-   struct LessThanByFileSize
+   struct LessThanLastDate
    {
       bool operator()(const T& lhs, const T& rhs) const
       {
@@ -23,9 +22,9 @@ public:
    CacheManager(const std::string& consistDataFilePath, size_t cacheSize = 10)
       : m_cacheSize(cacheSize)
    {
-      m_cacheQueue = new fixed_queue<T, std::deque<T>, LessThanByFileSize>(m_cacheSize);
+      m_cacheQueue = new fixed_queue<T, std::vector<T>, LessThanLastDate>(m_cacheSize);
 
-      m_jsonManager = new jsonIOManager<T, It>(consistDataFilePath);
+      m_jsonManager = new jsonIOManager<T, Iter>(consistDataFilePath);
    }
    ~CacheManager()
    {
@@ -50,7 +49,7 @@ public:
          m_cacheQueue->push(T(ob.getPersonalID(), ob.getName(),
                                     ob.getSurname(), ob.getEmail(), ob.getLastUpdate()));
       }
-
+       
       return true;
    }
 
@@ -80,7 +79,11 @@ public:
       assert(m_jsonManager);
       assert(m_cacheQueue);
 
-      m_cacheQueue->erase(person_id);
+      m_cacheQueue->erase(person_id, 
+                            [&](std::string const& id, Iter itR)-> bool {
+                                  return (string_utils::compare_case_sensitive(id, itR->getPersonalID()));
+                           });
+
       m_jsonManager->Delete(person_id);
    }
 
@@ -89,7 +92,11 @@ public:
       assert(m_jsonManager);
       assert(m_cacheQueue);
 
-      auto ptr2pers = m_cacheQueue->find(person_id);
+      auto comp = [&](std::string const& id, Iter itR)-> bool {
+         return (string_utils::compare_case_sensitive(id, itR->getPersonalID()));
+      };
+
+      auto ptr2pers = m_cacheQueue->find(person_id, comp);
       return (nullptr != ptr2pers)
                ? ptr2pers
                : m_jsonManager->Find(person_id);
@@ -98,7 +105,9 @@ public:
 private:
    size_t   m_cacheSize;
 
-   fixed_queue<T, std::deque<T>, LessThanByFileSize>* m_cacheQueue;
-
-   jsonIOManager<T, It>* m_jsonManager;
+   typedef typename std::vector<T>::iterator  Iter;
+   fixed_queue<T, std::vector<T>, LessThanLastDate>* m_cacheQueue;
+   
+   jsonIOManager<T, Iter>* m_jsonManager;
+   std::unordered_map< std::string, Iter >  m_lookupTable;
 };
