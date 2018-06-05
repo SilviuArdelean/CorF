@@ -24,7 +24,7 @@ public:
    {
       m_cacheQueue = new fixed_queue<T, std::vector<T>, LessThanLastDate>(m_cacheSize);
 
-      m_jsonManager = new jsonIOManager<T, Iter>(consistDataFilePath);
+      m_jsonManager = new jsonIOManager<T>(consistDataFilePath);
    }
    ~CacheManager()
    {
@@ -37,17 +37,17 @@ public:
       assert(m_jsonManager);
       assert(m_cacheQueue);
 
-      if (!m_jsonManager->LoadFile())
+      if (!m_jsonManager->Initialize())
       {
          std::cout << "Cache initialization has fail - invalid source" << std::endl;
          return false;
       }
 
       // fill the cache queue
-      for (auto &ob : m_jsonManager->GetConsistentDataList())
+      for (auto &ob : m_jsonManager->GetDataLookupTable())
       {
-         m_cacheQueue->push(T(ob.getPersonalID(), ob.getName(),
-                                    ob.getSurname(), ob.getEmail(), ob.getLastUpdate()));
+         m_cacheQueue->push(T(ob.second.getPersonalID(), ob.second.getName(),
+                              ob.second.getSurname(), ob.second.getEmail(), ob.second.getLastUpdate()));
       }
        
       return true;
@@ -96,9 +96,15 @@ public:
       };
 
       auto ptr2pers = m_cacheQueue->find(person_id, comp);
-      return (nullptr != ptr2pers)
-               ? ptr2pers
-               : m_jsonManager->Find(person_id);
+      if (nullptr != ptr2pers)
+         return ptr2pers;
+
+      auto ptrCrtPerson = m_jsonManager->Find(person_id);
+
+      m_cacheQueue->push(*ptrCrtPerson); // add to cache for future faster approach
+      
+      return ptrCrtPerson;
+
    }
    
 private:
@@ -107,6 +113,5 @@ private:
    typedef typename std::vector<T>::iterator  Iter;
    fixed_queue<T, std::vector<T>, LessThanLastDate>* m_cacheQueue;
    
-   jsonIOManager<T, Iter>* m_jsonManager;
-   std::unordered_map< std::string, Iter >  m_lookupTable;
+   jsonIOManager<T>* m_jsonManager;
 };

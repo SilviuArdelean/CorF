@@ -7,7 +7,7 @@
 #include "rapidjson/prettywriter.h" // for stringify JSON
 #include "string_utils.h"
 
-template<typename T, typename Iter>
+template<typename T>
 class jsonIOManager
 {
 public:
@@ -27,7 +27,7 @@ public:
 
    void SetSaveAsFileName(const std::string& strFile) { m_strFileSaveAs = strFile; }
 
-   bool LoadFile()
+   bool Initialize()
    {
       std::ifstream ifs(m_jsonFilePath);
 
@@ -59,24 +59,19 @@ public:
             return string_utils::getEpochTime(lhs.getLastUpdate()) > string_utils::getEpochTime(rhs.getLastUpdate());
          });
 
-      m_dataList.clear();
-
-      std::move( std::begin(vectData), std::end(vectData), std::back_inserter(m_dataList));
-      vectData.clear();
-
-      InitLookupTable();
+      InitLookupTable(vectData);
 
       return true;
    }
 
-   void InitLookupTable()
+   void InitLookupTable(std::vector<T>&  vectData)
    {
-      auto it = m_dataList.begin();
-      m_lookupTable.reserve(m_dataList.size());
+      auto it = vectData.begin();
+      m_lookupTable.reserve(vectData.size());
 
-      while (it != m_dataList.end())
+      while (it != vectData.end())
       {
-         m_lookupTable[it->getPersonalID()] = it;
+         m_lookupTable[it->getPersonalID()] = *it;
          ++it;
       }
    }
@@ -96,7 +91,7 @@ public:
       fclose(file);
    }
 
-   std::list<T>& GetConsistentDataList()  { return  m_dataList; }
+   std::unordered_map< std::string, T > & GetDataLookupTable()  { return  m_lookupTable; }
    
    bool Add(const T& pers) 
    { 
@@ -107,10 +102,7 @@ public:
          return false;
       }
 
-      m_dataList.push_front(pers); 
-
-      auto it_new = m_dataList.begin();
-      m_lookupTable[it_new->getPersonalID()] = it_new;
+      m_lookupTable[pers.getPersonalID()] = pers;
 
       return true;
    }
@@ -119,7 +111,9 @@ public:
    { 
       auto item_iter = m_lookupTable.find(pers_id);
 
-      return (item_iter != m_lookupTable.end()) ? &*item_iter->second : nullptr;
+      return (item_iter != m_lookupTable.end())
+               ? dynamic_cast<T*>(&(item_iter->second))
+               : nullptr;
    }
 
    bool Delete(const std::string& pers_id)
@@ -128,8 +122,6 @@ public:
 
       if (item_iter != m_lookupTable.end())
       {
-         m_dataList.erase(item_iter->second);
-
          m_lookupTable.erase(item_iter);
          return true;
       }
@@ -146,10 +138,10 @@ protected:
 
       writer.StartArray();
 
-      for (auto& item : m_dataList)
+      for (auto& item : m_lookupTable)
       {
          writer.StartObject();
-         item.Serialize(writer);
+         item.second.Serialize(writer);
          writer.EndObject();
       }
 
@@ -160,10 +152,7 @@ private:
    std::string          m_jsonFilePath;
    std::string          m_strFileSaveAs;
 
-   typedef typename std::list<T>::iterator  Iter;
-
    rapidjson::Document  m_docJson;
-   std::list<T>         m_dataList;
 
-   std::unordered_map< std::string, Iter >  m_lookupTable;
+   std::unordered_map< std::string, T >  m_lookupTable;
 };

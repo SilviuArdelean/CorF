@@ -14,7 +14,7 @@
 class Person 
 {
 public:
-   Person() = delete;
+   Person() {}
 
    Person(const std::string& id, const std::string& name, const std::string& surname,
       const std::string& email, const std::string& lastupdate)
