@@ -65,7 +65,7 @@ public:
       assert(m_jsonManager);
       assert(m_cacheQueue);
 
-      if (m_cacheQueue->is_full())
+      if (m_cacheQueue->is_full()) //should be out
             m_cacheQueue->pop();
 
       m_cacheQueue->push(new_pers);
@@ -101,10 +101,12 @@ public:
 
       auto ptrCrtPerson = m_jsonManager->Find(person_id);
 
-      m_cacheQueue->push(*ptrCrtPerson); // add to cache for future faster approach
+      if (ptrCrtPerson) {
+         m_cacheQueue->push(*ptrCrtPerson); // add to cache for future faster approach
+         return ptrCrtPerson;
+      }
       
-      return ptrCrtPerson;
-
+      return nullptr;
    }
    
 private:

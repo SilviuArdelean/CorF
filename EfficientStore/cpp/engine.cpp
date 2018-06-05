@@ -25,6 +25,7 @@ void initEngine(const FunctionCallbackInfo<Value>& args)
 
 void addItem(const FunctionCallbackInfo<Value>& args)
 {
+   Isolate* isolate = args.GetIsolate();
    v8::String::Utf8Value personID(args[0]->ToString()); 
    v8::String::Utf8Value name(args[1]->ToString());
    v8::String::Utf8Value surname(args[2]->ToString());
@@ -35,10 +36,18 @@ void addItem(const FunctionCallbackInfo<Value>& args)
    std::string    strSurname = std::string(*surname);
    std::string    strEmail = std::string(*email);
 
-   auto    strLastUpdate = string_utils::actual_time2string();
-
-   
    std::string str_ui_response;
+   if (strPersonID.empty())
+   {
+      str_ui_response = "<br> No Person ID added. Please add a person ID.";
+      Local<String>  retval = String::NewFromUtf8(isolate, str_ui_response.c_str());
+      args.GetReturnValue().Set(retval);
+
+      return;
+   }
+
+   auto    strLastUpdate = string_utils::actual_time2string(); 
+   
    Person pers(strPersonID, strName, strSurname, strEmail, strLastUpdate);
    
    if (manager.AddItem(pers))
@@ -56,7 +65,7 @@ void addItem(const FunctionCallbackInfo<Value>& args)
       str_ui_response = "<br> Error! The person ID [" + strPersonID + "] already exists!";
    }
    
-   Isolate* isolate = args.GetIsolate();
+
    Local<String>  retval = String::NewFromUtf8(isolate, str_ui_response.c_str());
    args.GetReturnValue().Set(retval);
 }
@@ -67,6 +76,15 @@ void searchItem(const FunctionCallbackInfo<Value>& args) {
   v8::String::Utf8Value search_string(args[0]->ToString());
   std::string search_pid = std::string(*search_string);
   std::string str_ui_response;
+
+  if (search_pid.empty())
+  { 
+     str_ui_response = "<br> No search criteria available.";
+     Local<String>  retval = String::NewFromUtf8(isolate, str_ui_response.c_str());
+     args.GetReturnValue().Set(retval);
+
+     return;
+  }
 
   auto results = manager.SearchItem(search_pid);
   if (nullptr == results)
@@ -89,19 +107,29 @@ void searchItem(const FunctionCallbackInfo<Value>& args) {
 
 void deleteItem(const FunctionCallbackInfo<Value>& args)
 {
+   Isolate* isolate = args.GetIsolate();
    v8::String::Utf8Value personID(args[0]->ToString());
    std::string    strPersonID = std::string(*personID);
    std::string str_ui_response;
 
+   if (strPersonID.empty())
+   {
+      str_ui_response = "<br> Error! Person ID is empty.";
+      Local<String>  retval = String::NewFromUtf8(isolate, str_ui_response.c_str());
+      args.GetReturnValue().Set(retval);
+
+      return;
+   }
+
    if (manager.DeleteItem(strPersonID))
    {
       str_ui_response = "<br> The person ID: " + strPersonID + " was deleted!";
+      manager.Save(DATA_FILE);
    }
    else {
       str_ui_response = "<br> The person ID: " + strPersonID + " does not exists!";
    }
 
-   Isolate* isolate = args.GetIsolate();
    Local<String>  retval = String::NewFromUtf8(isolate, str_ui_response.c_str());
    args.GetReturnValue().Set(retval);
 }
