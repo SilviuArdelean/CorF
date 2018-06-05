@@ -11,11 +11,10 @@
 //   "last_update" : "2018-01-15 20:04:58"
 //}
 
-class Person {
+class Person 
+{
 public:
-   Person()
-   {
-   }
+   Person() = delete;
 
    Person(const std::string& id, const std::string& name, const std::string& surname,
       const std::string& email, const std::string& lastupdate)
@@ -27,15 +26,16 @@ public:
    {
    }
 
+   virtual ~Person() {}
+
    Person(const Person& rhs)
       : id_(rhs.id_), name_(rhs.name_), surname_(rhs.surname_),
       email_(rhs.email_), lastupdate_(rhs.lastupdate_)
    {
-   }
+   }   
 
-   virtual ~Person() {}
-
-   Person& operator=(const Person& rhs) {
+   Person& operator = (const Person& rhs) 
+   {
 
       if (this != &rhs)
       {
@@ -117,7 +117,7 @@ public:
    std::string getEmail() const { return email_; }
    std::string getLastUpdate() const { return lastupdate_; }
 
-private:
+protected:
    std::string id_;
    std::string name_;
    std::string surname_;

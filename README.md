@@ -2,7 +2,7 @@
 
 ### List of projects
 
-#### [EfficientStore](https://github.com/SilviuArdelean/CorF/tree/master/EfficientStore)
+#### [Efficient Store](https://github.com/SilviuArdelean/CorF/tree/master/EfficientStore)
 	 Technologies stack: C++ 14, NodeJS, C++ NodeJS addin, JavaScript, jQuery
 	 
 #### [Serspec](https://github.com/SlyMaximus/CorF/tree/master/Serspec)

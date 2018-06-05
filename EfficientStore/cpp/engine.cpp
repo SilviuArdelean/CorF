@@ -53,7 +53,7 @@ void addItem(const FunctionCallbackInfo<Value>& args)
       manager.Save(DATA_FILE);
    }
    else {
-      str_ui_response = "<br> Person ID [" + strPersonID + "] already exists!";
+      str_ui_response = "<br> Error! The person ID [" + strPersonID + "] already exists!";
    }
    
    Isolate* isolate = args.GetIsolate();
@@ -61,7 +61,7 @@ void addItem(const FunctionCallbackInfo<Value>& args)
    args.GetReturnValue().Set(retval);
 }
 
-void effectiveSearch(const FunctionCallbackInfo<Value>& args) {
+void searchItem(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
   
   v8::String::Utf8Value search_string(args[0]->ToString());
@@ -95,10 +95,10 @@ void deleteItem(const FunctionCallbackInfo<Value>& args)
 
    if (manager.DeleteItem(strPersonID))
    {
-      str_ui_response = "<br> The person ID: [" + strPersonID + "] was deleted!";
+      str_ui_response = "<br> The person ID: " + strPersonID + " was deleted!";
    }
    else {
-      str_ui_response = "<br> The person ID: [" + strPersonID + "] does not exists!";
+      str_ui_response = "<br> The person ID: " + strPersonID + " does not exists!";
    }
 
    Isolate* isolate = args.GetIsolate();
@@ -111,7 +111,7 @@ void init(Local<Object> exports) {
   NODE_SET_METHOD(exports, "initEngine", initEngine);
   NODE_SET_METHOD(exports, "addItem", addItem);
   NODE_SET_METHOD(exports, "deleteItem", deleteItem);
-  NODE_SET_METHOD(exports, "effectiveSearch",  effectiveSearch);
+  NODE_SET_METHOD(exports, "searchItem",  searchItem);
 }
 
 NODE_MODULE(engine_addon, init)

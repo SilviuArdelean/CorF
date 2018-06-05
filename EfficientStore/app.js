@@ -37,7 +37,7 @@ app.post('/search', urlencodedParser, function (req, res) {
 
    var search_string = req.body.search_text;
 
-   var search_result = addon.effectiveSearch(search_string);
+   var search_result = addon.searchItem(search_string);
 
    console.log("Search request for: { key = " + search_string + " } "); 
    console.log("--------------------------------------------------------");
