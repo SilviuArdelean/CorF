@@ -3,6 +3,9 @@
 #include "jsonIOManager.h"
 #include "fixed_queue.h"
 #include <memory>
+#include <mutex>
+
+std::mutex     g_i_mutexC;
 
 template <typename T>
 class CacheManager
@@ -37,6 +40,8 @@ public:
       assert(m_jsonManager);
       assert(m_cacheQueue);
 
+      std::lock_guard<std::mutex> lock(g_i_mutexC);
+
       if (!m_jsonManager->Initialize())
       {
          std::cout << "Cache initialization has fail - invalid source" << std::endl;
@@ -57,6 +62,8 @@ public:
    {
       assert(m_jsonManager);
 
+      std::lock_guard<std::mutex> lock(g_i_mutexC);
+
       m_jsonManager->Save2File(newFilePath);
    }
 
@@ -65,8 +72,10 @@ public:
       assert(m_jsonManager);
       assert(m_cacheQueue);
 
-      if (m_cacheQueue->is_full()) //should be out
-            m_cacheQueue->pop();
+      std::lock_guard<std::mutex> lock(g_i_mutexC);
+
+      //if (m_cacheQueue->is_full()) //should be out
+      //      m_cacheQueue->pop();
 
       m_cacheQueue->push(new_pers);
 
@@ -77,6 +86,8 @@ public:
    {
       assert(m_jsonManager);
       assert(m_cacheQueue);
+
+      std::lock_guard<std::mutex> lock(g_i_mutexC);
 
       m_cacheQueue->erase(person_id, 
                              [&](std::string const& id, Iter itR)-> bool {
@@ -90,6 +101,8 @@ public:
    {
       assert(m_jsonManager);
       assert(m_cacheQueue);
+      
+      std::lock_guard<std::mutex> lock(g_i_mutexC);
 
       auto comp = [&](std::string const& id, Iter itR)-> bool {
          return (string_utils::compare_case_sensitive(id, itR->getPersonalID()));
@@ -110,9 +123,12 @@ public:
    }
    
 private:
-   size_t   m_cacheSize;
-
+   size_t         m_cacheSize;
+   
    typedef typename std::vector<T>::iterator  Iter;
+
+   // for skills demo reasons I didn't use a lookup table here (as in jsonIOManager.h) 
+   // prefered to use a special way to limit items count and way to prioritize, the std::primary_queue
    fixed_queue<T, std::vector<T>, LessThanLastDate>* m_cacheQueue;
    
    jsonIOManager<T>* m_jsonManager;

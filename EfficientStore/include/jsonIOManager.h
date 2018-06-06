@@ -6,6 +6,9 @@
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/prettywriter.h" // for stringify JSON
 #include "string_utils.h"
+#include <mutex>
+
+std::mutex           g_i_mutexJ;
 
 template<typename T>
 class jsonIOManager
@@ -29,6 +32,8 @@ public:
 
    bool Initialize()
    {
+      std::lock_guard<std::mutex> lock(g_i_mutexJ);
+
       std::ifstream ifs(m_jsonFilePath);
 
       if (!ifs.is_open())
@@ -64,20 +69,10 @@ public:
       return true;
    }
 
-   void InitLookupTable(std::vector<T>&  vectData)
-   {
-      auto it = vectData.begin();
-      m_lookupTable.reserve(vectData.size());
-
-      while (it != vectData.end())
-      {
-         m_lookupTable[it->getPersonalID()] = *it;
-         ++it;
-      }
-   }
-
    void Save2File(const std::string& newFilePath)
    {
+      std::lock_guard<std::mutex> lock(g_i_mutexJ);
+
       rapidjson::StringBuffer sb;
       Serialize(sb);
 
@@ -95,6 +90,8 @@ public:
    
    bool Add(const T& pers) 
    { 
+      std::lock_guard<std::mutex> lock(g_i_mutexJ);
+
       auto it = m_lookupTable.find(pers.getPersonalID());
       if (it != m_lookupTable.end())
       {
@@ -109,6 +106,8 @@ public:
    
    T* Find(const std::string& pers_id)
    { 
+      std::lock_guard<std::mutex> lock(g_i_mutexJ);
+
       auto item_iter = m_lookupTable.find(pers_id);
 
       return (item_iter != m_lookupTable.end())
@@ -118,6 +117,8 @@ public:
 
    bool Delete(const std::string& pers_id)
    {
+      std::lock_guard<std::mutex> lock(g_i_mutexJ);
+
       auto item_iter = m_lookupTable.find(pers_id);
 
       if (item_iter != m_lookupTable.end())
@@ -131,6 +132,18 @@ public:
 
 
 protected:
+
+   void InitLookupTable(std::vector<T>&  vectData)
+   {
+      auto it = vectData.begin();
+      m_lookupTable.reserve(vectData.size());
+
+      while (it != vectData.end())
+      {
+         m_lookupTable[it->getPersonalID()] = *it;
+         ++it;
+      }
+   }
 
    void Serialize(rapidjson::StringBuffer& sb)
    {      
@@ -151,7 +164,7 @@ protected:
 private:
    std::string          m_jsonFilePath;
    std::string          m_strFileSaveAs;
-
+   
    rapidjson::Document  m_docJson;
 
    std::unordered_map< std::string, T >  m_lookupTable;
