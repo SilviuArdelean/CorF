@@ -10,12 +10,12 @@ The following functionalities should be implemented:
 
 ### Interface:
  Keys are strings, values are strings as well. Both have variable length:
-● A “ADD” call which adds a pair to the store
-● A “SEARCH” call which retrieves a pair from the store by key
-● A “DELETE” call which deletes a pair from the store by key
+- A “ADD” call which adds a pair to the store
+- A “SEARCH” call which retrieves a pair from the store by key
+- A “DELETE” call which deletes a pair from the store by key
 
 ### Internal functionalities:
-● Multiple clients can access the KV-Store simultaneously (multi-threaded/synchronization)
-● A cache eviction strategy should be implemented. The server should be constrained to a certain amount of memory (e.g. 10 MB). When this amount is reached, it should evict keys based on this strategy (e.g. FIFO, LRU, …)
-● Instead of evicting the cache keys, they should be swapped out of memory onto a persisting storage (e.g. disk) and picked up when they are required again.
+- Multiple clients can access the KV-Store simultaneously (multi-threaded/synchronization)
+- A cache eviction strategy should be implemented. The server should be constrained to a certain amount of memory (e.g. 10 MB). When this amount is reached, it should evict keys based on this strategy (e.g. FIFO, LRU, …)
+- Instead of evicting the cache keys, they should be swapped out of memory onto a persisting storage (e.g. disk) and picked up when they are required again.
 
