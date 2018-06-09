@@ -46,26 +46,21 @@ public:
       
       m_docJson.ParseStream<0>(isw);
 
-      std::vector<T>  vectData;
-      vectData.reserve(m_docJson.Size());
+      m_lookupTable.reserve(m_docJson.Size());
 
       for (rapidjson::SizeType i = 0; i < m_docJson.Size(); i++)
       {
-         vectData.push_back(T(m_docJson[i]["person_id"].GetString(),
-                                 m_docJson[i]["name"].GetString(),
-                                 m_docJson[i]["surname"].GetString(),
-                                 m_docJson[i]["email"].GetString(),
-                                 m_docJson[i]["last_update"].GetString()));
+         auto pers_id = m_docJson[i]["person_id"].GetString();
+
+         m_lookupTable.insert(
+               std::pair<std::string, T>(pers_id, 
+                      T(pers_id,
+                           m_docJson[i]["name"].GetString(),
+                           m_docJson[i]["surname"].GetString(),
+                           m_docJson[i]["email"].GetString(),
+                           m_docJson[i]["last_update"].GetString())));
       }
-
-      std::sort(vectData.begin(), vectData.end(),
-         [](const T& lhs, const T& rhs)
-         {
-            return string_utils::getEpochTime(lhs.getLastUpdate()) > string_utils::getEpochTime(rhs.getLastUpdate());
-         });
-
-      InitLookupTable(vectData);
-
+      
       return true;
    }
 
@@ -132,18 +127,6 @@ public:
 
 
 protected:
-
-   void InitLookupTable(std::vector<T>&  vectData)
-   {
-      auto it = vectData.begin();
-      m_lookupTable.reserve(vectData.size());
-
-      while (it != vectData.end())
-      {
-         m_lookupTable[it->getPersonalID()] = *it;
-         ++it;
-      }
-   }
 
    void Serialize(rapidjson::StringBuffer& sb)
    {      

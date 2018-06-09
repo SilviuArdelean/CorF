@@ -74,8 +74,9 @@ public:
 
       std::lock_guard<std::mutex> lock(g_i_mutexC);
 
-      //if (m_cacheQueue->is_full()) //should be out
-      //      m_cacheQueue->pop();
+      // make sure will reach the cache
+      if (m_cacheQueue->is_full()) 
+            m_cacheQueue->pop();
 
       m_cacheQueue->push(new_pers);
 
