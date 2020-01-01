@@ -1,32 +1,40 @@
 #pragma once
 #include "shape.h"
 
-class CRectangleShape : public CShape
-{
-  public:
-	CRectangleShape(CPoint centerPoint, short width, short height, short speed, CRect allowedMoveArea)
-		: CShape(centerPoint, width, height, speed, allowedMoveArea)
-	{
-	}
+class CRectangleShape : public CShape {
+ public:
+  CRectangleShape(CPoint centerPoint,
+                  short width,
+                  short height,
+                  short speed,
+                  CRect allowedMoveArea)
+      : CShape(centerPoint, width, height, speed, allowedMoveArea) {}
 
-	CRectangleShape(short centerPointX, short centerPointY, short width, short height, short speed, CRect allowedMoveArea)
-		: CShape(centerPointX, centerPointY, width, height, speed, allowedMoveArea)
-	{
-	}
+  CRectangleShape(short centerPointX,
+                  short centerPointY,
+                  short width,
+                  short height,
+                  short speed,
+                  CRect allowedMoveArea)
+      : CShape(centerPointX,
+               centerPointY,
+               width,
+               height,
+               speed,
+               allowedMoveArea) {}
 
-	~CRectangleShape() {}
+  ~CRectangleShape() {}
 
-	void Draw()
-	{
-		CPen workPen(PS_SOLID, 1, _color);
-		CBrush workBrush(_color);
+  void Draw() {
+    CPen workPen(PS_SOLID, 1, color_);
+    CBrush workBrush(color_);
 
-		CPen* oldPen = _pDC->SelectObject(&workPen);
-		auto oldBrush = _pDC->SelectObject(workBrush);
+    CPen* oldPen = pdc_->SelectObject(&workPen);
+    auto oldBrush = pdc_->SelectObject(workBrush);
 
-		_pDC->FillRect(&_rect, &workBrush);
+    pdc_->FillRect(&rect_, &workBrush);
 
-		_pDC->SelectObject(oldBrush);
-		_pDC->SelectObject(oldPen);
-	}
+    pdc_->SelectObject(oldBrush);
+    pdc_->SelectObject(oldPen);
+  }
 };

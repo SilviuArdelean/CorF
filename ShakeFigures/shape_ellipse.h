@@ -1,32 +1,40 @@
 #pragma once
 #include "shape.h"
 
-class CEllipseShape : public CShape
-{
-  public:
-	CEllipseShape(CPoint centerPoint, short width, short height, short speed, CRect allowedMoveArea)
-		: CShape(centerPoint, width, height, speed, allowedMoveArea)
-	{
-	}
+class CEllipseShape : public CShape {
+ public:
+  CEllipseShape(CPoint centerPoint,
+                short width,
+                short height,
+                short speed,
+                CRect allowedMoveArea)
+      : CShape(centerPoint, width, height, speed, allowedMoveArea) {}
 
-	CEllipseShape(short centerPointX, short centerPointY, short width, short height, short speed, CRect allowedMoveArea)
-		: CShape(centerPointX, centerPointY, width, height, speed, allowedMoveArea)
-	{
-	}
+  CEllipseShape(short centerPointX,
+                short centerPointY,
+                short width,
+                short height,
+                short speed,
+                CRect allowedMoveArea)
+      : CShape(centerPointX,
+               centerPointY,
+               width,
+               height,
+               speed,
+               allowedMoveArea) {}
 
-	~CEllipseShape() {}
+  ~CEllipseShape() {}
 
-	void Draw()
-	{
-		CPen workPen(PS_SOLID, 1, _color);
-		CBrush workBrush(_color);
+  void Draw() {
+    CPen workPen(PS_SOLID, 1, color_);
+    CBrush workBrush(color_);
 
-		CPen* oldPen = _pDC->SelectObject(&workPen);
-		auto oldBrush = _pDC->SelectObject(workBrush);
+    CPen* oldPen = pdc_->SelectObject(&workPen);
+    auto oldBrush = pdc_->SelectObject(workBrush);
 
-		_pDC->Ellipse(_rect);
+    pdc_->Ellipse(rect_);
 
-		_pDC->SelectObject(oldBrush);
-		_pDC->SelectObject(oldPen);
-	}
+    pdc_->SelectObject(oldBrush);
+    pdc_->SelectObject(oldPen);
+  }
 };

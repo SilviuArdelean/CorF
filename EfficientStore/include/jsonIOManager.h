@@ -1,154 +1,139 @@
 #pragma once
 
+#include <mutex>
 #include "general.h"
 #include "rapidjson/document.h"
-#include "rapidjson/writer.h"
 #include "rapidjson/istreamwrapper.h"
-#include "rapidjson/prettywriter.h" // for stringify JSON
+#include "rapidjson/prettywriter.h"  // for stringify JSON
+#include "rapidjson/writer.h"
 #include "string_utils.h"
-#include <mutex>
 
-std::mutex           g_i_mutexJ;
+std::mutex g_i_mutexJ;
 
-template<typename T>
-class jsonIOManager
-{
-public:
-   jsonIOManager() = delete;
+template <typename T>
+class jsonIOManager {
+ public:
+  jsonIOManager() = delete;
 
-   jsonIOManager(const std::string& jsonFilePath)
-      : m_jsonFilePath(jsonFilePath)
-      , m_strFileSaveAs("")
-   {
-   }
+  jsonIOManager(const std::string& jsonFilePath)
+      : json_file_path_(jsonFilePath), file_path_save_as_("") {}
 
-   ~jsonIOManager()
-   {
-      // Force saving data to file - RTTI based stuff
-      Save2File(m_strFileSaveAs.empty() ? m_jsonFilePath : m_strFileSaveAs);
-   }
+  ~jsonIOManager() {
+    // Force saving data to file - RTTI based stuff
+    Save2File(file_path_save_as_.empty() ? json_file_path_ : file_path_save_as_);
+  }
 
-   void SetSaveAsFileName(const std::string& strFile) { m_strFileSaveAs = strFile; }
+  void SetSaveAsFileName(const std::string& strFile) {
+    file_path_save_as_ = strFile;
+  }
 
-   bool Initialize()
-   {
-      std::lock_guard<std::mutex> lock(g_i_mutexJ);
+  bool Initialize() {
+    std::lock_guard<std::mutex> lock(g_i_mutexJ);
 
-      std::ifstream ifs(m_jsonFilePath);
+    std::ifstream ifs(json_file_path_);
 
-      if (!ifs.is_open())
-      {
-         std::cout << "Error opening file: " << m_jsonFilePath << std::endl;
-         return false;
-      }
+    if (!ifs.is_open()) {
+      std::cout << "Error opening file: " << json_file_path_ << std::endl;
+      return false;
+    }
 
-      rapidjson::IStreamWrapper isw(ifs);
-      
-      m_docJson.ParseStream<0>(isw);
+    rapidjson::IStreamWrapper isw(ifs);
 
-      m_lookupTable.reserve(m_docJson.Size());
+    doc_json_.ParseStream<0>(isw);
 
-      for (rapidjson::SizeType i = 0; i < m_docJson.Size(); i++)
-      {
-         auto pers_id = m_docJson[i]["person_id"].GetString();
+    lookup_table_.reserve(doc_json_.Size());
 
-         m_lookupTable.insert(
-               std::pair<std::string, T>(pers_id, 
-                      T(pers_id,
-                           m_docJson[i]["name"].GetString(),
-                           m_docJson[i]["surname"].GetString(),
-                           m_docJson[i]["email"].GetString(),
-                           m_docJson[i]["last_update"].GetString())));
-      }
-      
-      return true;
-   }
+    for (rapidjson::SizeType i = 0; i < doc_json_.Size(); i++) {
+      auto pers_id = doc_json_[i]["person_id"].GetString();
 
-   void Save2File(const std::string& newFilePath)
-   {
-      std::lock_guard<std::mutex> lock(g_i_mutexJ);
+      lookup_table_.insert(std::pair<std::string, T>(
+          pers_id, T(pers_id, doc_json_[i]["name"].GetString(),
+                     doc_json_[i]["surname"].GetString(),
+                     doc_json_[i]["email"].GetString(),
+                     doc_json_[i]["last_update"].GetString())));
+    }
 
-      rapidjson::StringBuffer sb;
-      Serialize(sb);
+    return true;
+  }
+
+  void Save2File(const std::string& newFilePath) {
+    std::lock_guard<std::mutex> lock(g_i_mutexJ);
+
+    rapidjson::StringBuffer sb;
+    Serialize(sb);
 
 #ifdef _DEBUG
-      puts(sb.GetString());
+    puts(sb.GetString());
 #endif
 
-      FILE* file;
-      file = fopen(newFilePath.c_str(), "w");
-      fprintf(file, "%s", sb.GetString());
-      fclose(file);
-   }
+    FILE* file;
+    file = fopen(newFilePath.c_str(), "w");
+    fprintf(file, "%s", sb.GetString());
+    fclose(file);
+  }
 
-   std::unordered_map< std::string, T > & GetDataLookupTable()  { return  m_lookupTable; }
-   
-   bool Add(const T& pers) 
-   { 
-      std::lock_guard<std::mutex> lock(g_i_mutexJ);
+  std::unordered_map<std::string, T>& GetDataLookupTable() {
+    return lookup_table_;
+  }
 
-      auto it = m_lookupTable.find(pers.getPersonalID());
-      if (it != m_lookupTable.end())
-      {
-         std::cout << "Person ID " << pers.getPersonalID() << " already exists" << std::endl;
-         return false;
-      }
+  bool Add(const T& pers) {
+    std::lock_guard<std::mutex> lock(g_i_mutexJ);
 
-      m_lookupTable[pers.getPersonalID()] = pers;
+    auto it = lookup_table_.find(pers.getPersonalID());
+    if (it != lookup_table_.end()) {
+      std::cout << "Person ID " << pers.getPersonalID() << " already exists"
+                << std::endl;
+      return false;
+    }
 
-      return true;
-   }
-   
-   T* Find(const std::string& pers_id)
-   { 
-      std::lock_guard<std::mutex> lock(g_i_mutexJ);
+    lookup_table_[pers.getPersonalID()] = pers;
 
-      auto item_iter = m_lookupTable.find(pers_id);
+    return true;
+  }
 
-      return (item_iter != m_lookupTable.end())
+  T* Find(const std::string& pers_id) {
+    std::lock_guard<std::mutex> lock(g_i_mutexJ);
+
+    auto item_iter = lookup_table_.find(pers_id);
+
+    return (item_iter != lookup_table_.end())
                ? dynamic_cast<T*>(&(item_iter->second))
                : nullptr;
-   }
+  }
 
-   bool Delete(const std::string& pers_id)
-   {
-      std::lock_guard<std::mutex> lock(g_i_mutexJ);
+  bool Delete(const std::string& pers_id) {
+    std::lock_guard<std::mutex> lock(g_i_mutexJ);
 
-      auto item_iter = m_lookupTable.find(pers_id);
+    auto item_iter = lookup_table_.find(pers_id);
 
-      if (item_iter != m_lookupTable.end())
-      {
-         m_lookupTable.erase(item_iter);
-         return true;
-      }
+    if (item_iter != lookup_table_.end()) {
+      lookup_table_.erase(item_iter);
+      return true;
+    }
 
-      return false;
-   }
+    return false;
+  }
 
+ protected:
+  void Serialize(rapidjson::StringBuffer& sb) {
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
 
-protected:
+    writer.StartArray();
 
-   void Serialize(rapidjson::StringBuffer& sb)
-   {      
-      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+    for (auto& item : lookup_table_) {
+      writer.StartObject();
+      item.second.Serialize(writer);
+      writer.EndObject();
+    }
 
-      writer.StartArray();
+    writer.EndArray();
+  }
 
-      for (auto& item : m_lookupTable)
-      {
-         writer.StartObject();
-         item.second.Serialize(writer);
-         writer.EndObject();
-      }
+ private:
+  std::string json_file_path_;
+  std::string file_path_save_as_;
 
-      writer.EndArray();
-   }
+  rapidjson::Document doc_json_;
 
-private:
-   std::string          m_jsonFilePath;
-   std::string          m_strFileSaveAs;
-   
-   rapidjson::Document  m_docJson;
-
-   std::unordered_map< std::string, T >  m_lookupTable;
+  std::unordered_map<std::string, T> lookup_table_;
 };

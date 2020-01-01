@@ -1,9 +1,9 @@
 #pragma once
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <queue>
-#include <list>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <list>
+#include <queue>
+#include <string>
 #include <unordered_map>
+#include <vector>

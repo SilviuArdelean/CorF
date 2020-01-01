@@ -45,6 +45,7 @@ ipch/
 ShakeFigures/Debug/
 ShakeFigures/Debug/ShakeFigures.tlog/
 ShakeFigures/Release/
+ShakeFigures/x64/
 Serspec/x64/Debug/
 Serspec/win32/Debug/
 Serspec/x64/Release/
