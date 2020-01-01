@@ -19,3 +19,15 @@ The following functionalities should be implemented:
 - A cache eviction strategy should be implemented. The server should be constrained to a certain amount of memory (e.g. 10 MB). When this amount is reached, it should evict keys based on this strategy (e.g. FIFO, LRU, …)
 - Instead of evicting the cache keys, they should be swapped out of memory onto a persisting storage (e.g. disk) and picked up when they are required again.
 
+### Devlopment environemnt important remarks
+It uses Visual Studio Node.JS additions.
+Important tools to compile and run:
+```
+npm install express
+npm install -g node-gyp 
+```
+The compilation of the C++ addin is done using
+```
+node-gyp configure
+node-gyp build
+```
