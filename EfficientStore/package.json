@@ -7,7 +7,7 @@
     "name": "silviu"
   },
   "dependencies": {
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "server.js": "^1.0.0"
   }
 }
