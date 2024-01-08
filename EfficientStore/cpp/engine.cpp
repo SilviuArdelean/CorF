@@ -23,10 +23,35 @@ void initEngine(const FunctionCallbackInfo<Value>& args) {
 
 void addItem(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
-  v8::String::Utf8Value personID(args[0]->ToString());
-  v8::String::Utf8Value name(args[1]->ToString());
-  v8::String::Utf8Value surname(args[2]->ToString());
-  v8::String::Utf8Value email(args[3]->ToString());
+  HandleScope scope(isolate);
+  Local<Context> context = isolate->GetCurrentContext();
+ // v8::String::Utf8Value str(isolate, value->ToString(context).ToLocalChecked());
+
+  if (args.Length() < 4) {
+    isolate->ThrowException(String::NewFromUtf8(isolate,
+                                                "Wrong number of arguments",
+                                                NewStringType::kNormal)
+                                .ToLocalChecked());
+    return;
+  }
+
+  for (int i = 0; i < 4; i++) {
+    if (!args[i]->IsString()) {
+      isolate->ThrowException(String::NewFromUtf8(isolate, "Wrong arguments",
+                                                  NewStringType::kNormal)
+                                  .ToLocalChecked());
+      return;
+    }
+  }
+
+  v8::String::Utf8Value personID(isolate,
+                                 args[0]->ToString(context).ToLocalChecked());
+  v8::String::Utf8Value name(isolate,
+                             args[1]->ToString(context).ToLocalChecked());
+  v8::String::Utf8Value surname(isolate,
+                                args[2]->ToString(context).ToLocalChecked());
+  v8::String::Utf8Value email(isolate,
+                              args[3]->ToString(context).ToLocalChecked());
 
   std::string strPersonID = std::string(*personID);
   std::string strName = std::string(*name);
@@ -36,8 +61,18 @@ void addItem(const FunctionCallbackInfo<Value>& args) {
   std::string str_ui_response;
   if (strPersonID.empty()) {
     str_ui_response = "<br> No Person ID added. Please add a person ID.";
-    Local<String> retval =
-        String::NewFromUtf8(isolate, str_ui_response.c_str());
+    MaybeLocal<String> maybeStr = String::NewFromUtf8(
+        isolate, str_ui_response.c_str(), NewStringType::kNormal);
+
+    if (maybeStr.IsEmpty()) {
+      isolate->ThrowException(String::NewFromUtf8(isolate,
+                                                  "String creation failed",
+                                                  NewStringType::kNormal)
+                                  .ToLocalChecked());
+      return;
+    }
+
+    Local<String> retval = maybeStr.ToLocalChecked();
     args.GetReturnValue().Set(retval);
 
     return;
@@ -62,23 +97,52 @@ void addItem(const FunctionCallbackInfo<Value>& args) {
         "<br> Error! The person ID [" + strPersonID + "] already exists!";
   }
 
-  Local<String> retval = String::NewFromUtf8(isolate, str_ui_response.c_str());
+  Local<String> retval;
+  MaybeLocal<String> maybeRetVal =
+      String::NewFromUtf8(isolate, str_ui_response.c_str());
+
+  if (!maybeRetVal.ToLocal(&retval)) {
+    isolate->ThrowException(String::NewFromUtf8(isolate,
+                                                "Error creating string",
+                                                NewStringType::kNormal)
+                                .ToLocalChecked());
+    return;
+  }
+
   args.GetReturnValue().Set(retval);
 }
 
 void searchItem(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
+  HandleScope scope(isolate);
+  Local<Context> context = isolate->GetCurrentContext();
 
-  v8::String::Utf8Value search_string(args[0]->ToString());
+  if (args.Length() < 1 || !args[0]->IsString()) {
+    isolate->ThrowException(
+        String::NewFromUtf8(isolate, "First argument must be a string",
+                            NewStringType::kNormal)
+            .ToLocalChecked());
+    return;
+  }
+
+  v8::String::Utf8Value search_string(
+      isolate, args[0]->ToString(context).ToLocalChecked());
   std::string search_pid = std::string(*search_string);
   std::string str_ui_response;
 
   if (search_pid.empty()) {
     str_ui_response = "<br> No search criteria available.";
-    Local<String> retval =
-        String::NewFromUtf8(isolate, str_ui_response.c_str());
+    MaybeLocal<String> maybeRetVal = String::NewFromUtf8(
+        isolate, str_ui_response.c_str(), NewStringType::kNormal);
+    Local<String> retval;
+    if (!maybeRetVal.ToLocal(&retval)) {
+      isolate->ThrowException(String::NewFromUtf8(isolate,
+                                                  "Error creating string",
+                                                  NewStringType::kNormal)
+                                  .ToLocalChecked());
+      return;
+    }
     args.GetReturnValue().Set(retval);
-
     return;
   }
 
@@ -96,34 +160,59 @@ void searchItem(const FunctionCallbackInfo<Value>& args) {
     str_ui_response += "<br> Last Update   : " + results->getLastUpdate();
   }
 
-  Local<String> retval = String::NewFromUtf8(isolate, str_ui_response.c_str());
-  args.GetReturnValue().Set(retval);
+
+  Local<String> retval;
+  MaybeLocal<String> maybeRetVal =
+      String::NewFromUtf8(isolate, str_ui_response.c_str());
+
+  if (!maybeRetVal.IsEmpty()) {
+    retval = maybeRetVal.ToLocalChecked();
+    args.GetReturnValue().Set(retval);
+  } else {
+    isolate->ThrowException(String::NewFromUtf8(isolate,
+                                                "String creation failed",
+                                                NewStringType::kNormal)
+                                .ToLocalChecked());
+  }
 }
 
 void deleteItem(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
-  v8::String::Utf8Value personID(args[0]->ToString());
+  HandleScope scope(isolate);
+  Local<Context> context = isolate->GetCurrentContext();
+
+  if (args.Length() < 1 || !args[0]->IsString()) {
+    isolate->ThrowException(
+        String::NewFromUtf8(isolate, "First argument must be a string",
+                            NewStringType::kNormal)
+            .ToLocalChecked());
+    return;
+  }
+
+  v8::String::Utf8Value personID(isolate,
+                                 args[0]->ToString(context).ToLocalChecked());
   std::string strPersonID = std::string(*personID);
   std::string str_ui_response;
 
   if (strPersonID.empty()) {
     str_ui_response = "<br> Error! Person ID is empty.";
-    Local<String> retval =
-        String::NewFromUtf8(isolate, str_ui_response.c_str());
-    args.GetReturnValue().Set(retval);
-
-    return;
-  }
-
-  if (manager.DeleteItem(strPersonID)) {
+  } else if (manager.DeleteItem(strPersonID)) {
     str_ui_response = "<br> The person ID: " + strPersonID + " was deleted!";
     manager.Save(DATA_FILE);
   } else {
-    str_ui_response =
-        "<br> The person ID: " + strPersonID + " does not exists!";
+    str_ui_response = "<br> The person ID: " + strPersonID + " does not exist!";
   }
 
-  Local<String> retval = String::NewFromUtf8(isolate, str_ui_response.c_str());
+  Local<String> retval;
+  MaybeLocal<String> maybeRetVal = String::NewFromUtf8(
+      isolate, str_ui_response.c_str(), NewStringType::kNormal);
+  if (!maybeRetVal.ToLocal(&retval)) {
+    isolate->ThrowException(String::NewFromUtf8(isolate,
+                                                "String creation failed",
+                                                NewStringType::kNormal)
+                                .ToLocalChecked());
+    return;
+  }
   args.GetReturnValue().Set(retval);
 }
 
