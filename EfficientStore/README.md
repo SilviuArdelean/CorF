@@ -31,3 +31,11 @@ The compilation of the C++ addin is done using
 node-gyp configure
 node-gyp build
 ```
+
+Starting the node.JS server
+
+`node app.js`
+
+Accesing the Web interface
+
+`localhost:3000`
