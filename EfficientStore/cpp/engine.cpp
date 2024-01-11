@@ -2,14 +2,14 @@
 #include <node.h>
 #include <iostream>
 #include <string>
-#include "..\include\CacheManager.h"
-#include "..\include\Person.h"
+#include "../include/CacheManager.h"
+#include "../include/Person.h"
 
 using namespace v8;
 
 #define CACHE_SIZE 100
-#define DATA_FILE "data\\persons.json"
-#define DATA_FILE_OUTPUT_TESTONLY "data\\persons_saveas.json"
+#define DATA_FILE "data//persons.json"
+#define DATA_FILE_OUTPUT_TESTONLY "data//persons_saveas.json"
 
 CacheManager<Person> manager(DATA_FILE, CACHE_SIZE);
 
