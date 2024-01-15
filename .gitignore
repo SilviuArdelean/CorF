@@ -38,6 +38,7 @@
 *.user
 *.vc.vc.opendb
 *.vcxproj.user
+*.filters
 .vs/
 bin/
 bin64/
@@ -52,4 +53,11 @@ Serspec/x64/Release/
 Serspec/win32/Release/
 browsersBenchmark/obj/Debug/
 browsersBenchmark/obj/Release/
-/EfficientStore/UpgradeLog.htm
+image-to-grey-scale-demo/build/
+/image-to-grey-scale-demo/image_server/
+/image-to-grey-scale-demo/cpp/
+/image-to-grey-scale-demo/cpp_addon/
+/image-to-grey-scale-demo/cpp/build/Release
+/image-to-grey-scale-demo/obj/
+/image-to-grey-scale-demo/node_modules
+/image-to-grey-scale-demo/Release

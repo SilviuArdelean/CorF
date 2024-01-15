@@ -1,4 +1,3 @@
-// search.cpp
 #include <node.h>
 #include <iostream>
 #include <string>
