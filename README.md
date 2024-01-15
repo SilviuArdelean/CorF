@@ -2,6 +2,8 @@
 
 ### List of projects
 
+#### [Image to greyscale](https://github.com/SilviuArdelean/CorF/tree/master/image-to-grayscale)
+	 Technologies stack: C++ 1x, NodeJS, C++ NodeJS addin, JavaScript, jQuery
 #### [Efficient Store](https://github.com/SilviuArdelean/CorF/tree/master/EfficientStore)
 	 Technologies stack: C++ 14, NodeJS, C++ NodeJS addin, JavaScript, jQuery
 	 

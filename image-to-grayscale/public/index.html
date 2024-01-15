@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Conversion to Grayscale</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .upload-area {
+            margin-bottom: 20px;
+        }
+        .image-display {
+            display: flex;
+            justify-content: space-between;
+        }
+        .image-container {
+            width: 48%;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Image Processing To Grey
+        </div>
+        <div class="upload-area">
+            <input type="file" id="imageInput">
+        </div>
+        <div class="image-display">
+            <div class="image-container">
+                <h3>Original Image</h3>
+                <img id="originalImage" src="#" alt="Original image will be displayed here">
+            </div>
+            <div class="image-container">
+                <h3>Processed Image</h3>
+                <img id="processedImage" src="#" alt="Processed image will be displayed here">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $('#imageInput').change(function (event) {
+                var reader = new FileReader();
+                reader.onload = function () {
+                    var output = $('#originalImage');
+                    output.attr('src', reader.result);
+
+                    // Create a FormData object and append the file
+                    var formData = new FormData();
+                    formData.append('image', event.target.files[0]);
+
+                    $.ajax({
+                        url: '/upload',
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            // Create a URL for the processed image and display it
+                            $('#processedImage').attr('src', data.url);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.error('Error:', textStatus, errorThrown);
+                        }
+                    });
+                };
+                reader.readAsDataURL(event.target.files[0]);
+            });
+        });
+    </script>
+  </body>
+</html>
+
