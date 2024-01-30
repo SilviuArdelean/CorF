@@ -42,13 +42,9 @@ app.post('/upload', (req, res) => {
                     return res.status(500).send(err);
                 }
 
-                if (!processedImagePath) {
-                    console.error("Processed image path is undefined.");
-                    return res.status(500).send("Error processing image.");
-                }
-
                 if (!fs.existsSync(processedImagePath)) {
                     console.log("The new generated path is invalid: ", processedImagePath);
+                    return;
                 }
                 // Send the relative URL to the processed image
                 const processedImageUrl = `/uploads/${path.basename(processedImagePath)}`;
